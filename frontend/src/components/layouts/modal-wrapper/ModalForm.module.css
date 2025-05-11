@@ -1,0 +1,24 @@
+/*モーダルウィンドウ設定*/
+.modalStyle{
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 10px;
+
+    margin: auto;
+    padding: 2px;
+    background-color: white;
+    outline: none;
+}
+
+.overlayStyle{
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+

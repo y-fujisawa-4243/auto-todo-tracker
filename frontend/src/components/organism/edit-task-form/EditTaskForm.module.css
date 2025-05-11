@@ -1,0 +1,64 @@
+/*ウィンドウ内*/
+.formBox, .btnWrap, .container h3 {
+    width: 100%;
+    max-width: 20rem;
+}
+
+
+.container h3{
+    text-align: center;
+    margin: 2rem auto 1rem;
+}
+
+
+
+/*入力フォーム*/
+.formBox{
+    display: flex;
+    flex-direction: column;
+    margin: 2rem auto;
+}
+
+.formBox input,
+.formBox textarea {
+    font-size: 14px;
+    width: 100%;
+    padding: 10px;
+    border: 2px solid grey;
+    border-radius: 10px;
+}
+
+.formBox input:focus,
+.formBox textarea:focus{
+    outline: none;
+}
+
+.formBox textarea {
+    min-height: 10rem;
+    resize: none;
+}
+
+.formBox label {
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+
+/*ボタン*/
+.btnWrap{
+    text-align: center;
+    margin: 0px auto 2rem;
+}
+.cancelBtn{
+    background-color: rgb(236, 74, 33);
+    color: white;
+    width: 100px;
+}
+
+.createBtn{
+    background-color: rgb(8, 144, 255);
+    color: white;
+    width: 100px;
+    margin-left: 10px;
+}
+

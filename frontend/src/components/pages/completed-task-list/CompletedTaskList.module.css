@@ -1,0 +1,45 @@
+.container{
+    width: 48rem;
+    
+    margin: 3rem auto 0;
+}
+
+.btnBox{
+    width: 80%;
+    margin: 0px auto 2rem;
+    display: flex;
+    justify-content: right;
+}
+
+.uniqueBtn{
+    background-color: rgb(73, 73, 73);
+    color: white;
+
+}
+
+.taskField{
+    width: 80%;
+    height: auto;
+    padding: 1px 0px 5px 0px;
+    margin: 0px auto 2rem;
+    border-radius: 1rem;
+}
+
+.taskField:last-of-type {
+    margin-bottom: 0;
+}
+
+.taskField h3{
+    border-bottom: solid 2px grey;
+}
+
+.notTaskMessage{
+    text-align: center;
+}
+
+.cardContainer{
+    margin: 1rem auto; 
+    display: flex;
+    justify-content: center;
+}
+

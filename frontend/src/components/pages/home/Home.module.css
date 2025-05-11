@@ -1,0 +1,11 @@
+.container{
+    width: 100%;
+    max-width: 48rem;
+    margin:auto;
+    text-align: center;
+}
+
+.button{
+    background-color: rgb(138, 252, 198);
+    color: black;
+}

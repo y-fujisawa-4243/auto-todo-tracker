@@ -1,0 +1,67 @@
+/*カード全体*/
+.cardBox{
+    width:600px;
+    height: 50px;
+    display: grid;
+    grid-template-rows: 100%;
+    grid-template-columns: 6fr 2fr 1fr 1fr;
+    
+    align-items: center; 
+    border: solid 1px rgb(197, 197, 197);
+    border-radius: 6px;
+    background-color: rgb(255, 255, 255);
+}
+
+.cardBox p{
+    display: inline-block;
+    max-height: 20px;
+    margin: 0px 1rem;
+}
+
+.cardBox ul{
+    display: flex;
+    flex-direction: row;
+}
+
+.cardBox li{
+    list-style: none;
+    margin: 0px 3px;
+}
+
+.cardBox:hover{
+    background-color:yellow;
+}
+
+
+/*ボタン設定*/
+.icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 28px;     
+    height: 28px;
+    cursor: pointer;
+    color: black;
+    background-color: white;
+    border: solid 1px grey;
+    border-radius: 10px;
+}
+
+
+/*ケバブメニュー設定*/
+.kebabMenu{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 28px;     
+    height: 28px;
+    cursor: pointer;
+    color: black;
+    background-color: white;
+    border: solid 1px grey;
+    border-radius: 10px;
+}
+
+.kebabMenu svg{
+    font-size: 20px;
+}

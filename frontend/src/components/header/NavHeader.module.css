@@ -1,0 +1,24 @@
+.container{
+    width: 48rem;
+    margin: 0px auto;
+}
+
+.wrapper{
+    width: 80%;
+    margin: 0px auto 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ui{
+    list-style: none;
+    display: flex;
+}
+
+.link{
+    display: inline-block;
+    margin: 0px 1rem;
+    text-decoration: none;
+    color: grey;
+}

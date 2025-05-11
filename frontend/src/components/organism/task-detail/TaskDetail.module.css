@@ -1,0 +1,32 @@
+/*フォーム内設定*/
+.formBox {
+    width: 100%;
+    max-width: 20rem;
+    margin: 2rem auto;
+}
+
+
+/*項目名*/
+.formBox h3{
+    text-align: center;
+}
+
+.formBox dd{
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 1rem;
+    white-space:pre-line;
+}
+
+
+/*ボタン*/
+.btnWrap{
+    text-align: center;
+    margin: 0px auto 2rem;
+}
+
+.cancelBtn{
+    background-color: rgb(236, 74, 33);
+    color: white;
+    width: 6rem;
+}

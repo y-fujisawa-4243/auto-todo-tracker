@@ -1,0 +1,13 @@
+body{
+    background:rgb(228, 228, 228)
+}
+
+.container{
+    width: 100%;
+    max-width: 60rem;
+    margin: 0px auto;
+}
+
+.container p{
+    font-size: 14px;
+}
