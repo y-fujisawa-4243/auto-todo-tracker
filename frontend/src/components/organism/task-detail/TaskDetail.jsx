@@ -19,9 +19,9 @@ const TaskDetail = () =>{
                 <h3>タスク詳細</h3>
                 <dl>
                     <dt><b>タスク名</b></dt>
-                    <dd>{currentTask.title}</dd>
+                    <dd>{currentTask.taskTitle}</dd>
                     <dt><b>タスク説明</b></dt>
-                    <dd>{currentTask.description}</dd>
+                    <dd>{currentTask.taskDescription}</dd>
                     <dt><b>作成日</b></dt>
                     <dd>{currentTask.createdAt}</dd>
                 </dl>

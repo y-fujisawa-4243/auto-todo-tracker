@@ -14,13 +14,13 @@ export const TaskTimerProvider = ({children}) => {
 
         console.log("開始")
         //計測中または開始タスクがすでに計測中ならば、何もしない。
-        if (intervalRef.current || runTaskIdRef.current === task.id) return;                
+        if (intervalRef.current || runTaskIdRef.current === task.taskId) return;                
 
-        runTaskIdRef.current = task.id
+        runTaskIdRef.current = task.taskId
 
         //過去の計測を反映
         const startTime = Date.now();
-        const taskTime = task.time * 1000               //sec → ms
+        const taskTime = task.elapsedTime * 1000               //sec → ms
         setElapsed(Math.floor(taskTime  / 1000));
         startedAtRef.current = startTime - taskTime;   
         
@@ -37,9 +37,11 @@ export const TaskTimerProvider = ({children}) => {
     const stopTimer = (task) => {
 
         console.log("停止")
+        console.log(intervalRef.current)
+        console.log(task.taskId)
 
         //未計測または他タスクの停止指示の場合、何もしない。
-        if(!intervalRef.current ||runTaskIdRef.current !== task.id ) return;
+        if(!intervalRef.current ||runTaskIdRef.current !== task.taskId ) return;
 
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -78,15 +80,15 @@ export const TaskTimerProvider = ({children}) => {
 
 
     const getTime = (task)=>{     
-        console.log(`runtask:::${runTaskIdRef.current}///taskid:::${task.id}`)
-        if (runTaskIdRef.current === task.id){
-            console.log("一致")
+        if (runTaskIdRef.current === task.taskId){
             return format(elapsed);
         } else{
-            console.log("不一致")
-            return format(task.time);
+            return format(task.elapsedTime);
         }
     }
+
+
+
 
 
     return(

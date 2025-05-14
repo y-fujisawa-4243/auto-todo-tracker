@@ -23,14 +23,14 @@ const CheckStartTask = ({tasks,handleUpdateTask}) =>{
                     >いいえ</button>
                     <button 
                     onClick={ async () =>{
-                        const runTaskArray =  tasks.filter( (task) => task.status === "RUNNING")
+                        const runTaskArray =  tasks.filter( (task) => task.taskStatus === "RUNNING")
                         console.log(`${currentTask}//${runTaskArray[0]}`)
 
                         switchTaskTimer(runTaskArray[0])
-                        await handleUpdateTask(runTaskArray[0].id,{status:"PAUSE",time:elapsed})
+                        await handleUpdateTask(runTaskArray[0].taskId,{taskStatus:"PAUSE",elapsedTime:elapsed})
 
                         startTimer(currentTask)
-                        await handleUpdateTask(currentTask.id,{status:"RUNNING"})
+                        await handleUpdateTask(currentTask.taskId,{taskStatus:"RUNNING"})
                     } }
                     className={cx(baseStyle.baseBtn,style.createBtn)}                       
                     >はい</button>

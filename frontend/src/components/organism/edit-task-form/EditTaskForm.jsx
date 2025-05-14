@@ -21,7 +21,7 @@ const EditTaskForm = ({handleUpdateTask}) =>{
                 <label>タスク名</label>
                 <input
                     type="text"
-                    placeholder={currentTask.title}
+                    placeholder={currentTask.taskTitle}
                     required
                     onChange={(event) => setTitle(event.target.value)}
                 ></input>
@@ -29,7 +29,7 @@ const EditTaskForm = ({handleUpdateTask}) =>{
             <div className={style.formBox}>
                 <label>タスク説明</label>
                 <textarea
-                    placeholder={currentTask.description}
+                    placeholder={currentTask.taskDescription}
                     onChange={(event) => setDescription(event.target.value)}
                 ></textarea>
             </div>
@@ -44,7 +44,7 @@ const EditTaskForm = ({handleUpdateTask}) =>{
             </button>
             <button 
                 type="submit" 
-                onClick={()=>handleUpdateTask(currentTask.id,{title:title,description:description})}
+                onClick={()=>handleUpdateTask(currentTask.taskId,{taskTitle:title,taskDescriptionescription:description})}
                 className={cx(baseStyle.baseBtn,style.createBtn)}
                 >保存
             </button>

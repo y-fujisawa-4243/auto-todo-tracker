@@ -25,7 +25,7 @@ const CheckDeleteTask = ({handleDeleteTask}) =>{
                     <button 
                     onClick={() => {
                         stopTimer(currentTask)
-                        handleDeleteTask(currentTask.id)
+                        handleDeleteTask(currentTask.taskId)
                     }
                     }
                     className={cx(baseStyle.baseBtn,style.createBtn)}                       

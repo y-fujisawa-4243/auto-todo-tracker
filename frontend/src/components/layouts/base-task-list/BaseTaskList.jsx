@@ -20,12 +20,14 @@ import baseStyle from "../../../style/Util.module.css"
 //自作関数
 import { postTask,deleteTask, getTasks,patchTask} from "../../../api/taskApi";
 import { getCreatedAt } from '../../../time/HandleTimerFuncs';
+import { useTaskTimer } from '../../../context/TaskTimerProvider';
 
 
 
 const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
 
     const {isOpen,modalType,openModal,closeModal} = useModalControl(); 
+    const {stopTimer,elapsed} = useTaskTimer();
 
 
     //タスクのグルーピング処理
@@ -37,7 +39,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
     }
 
     tasks.forEach(task =>{
-        switch(task.status){
+        switch(task.taskStatus){
             case "RUNNING":
                 groupedTasks["RUNNING"].push(task)
                 break;
@@ -54,24 +56,51 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
         }
     )
 
+        //立ち上げ時データ取得
+    useEffect( ()=>{
 
-    //立ち上げ時データ取得
-    useEffect(()=>{
         const fetchTasks = async () => {
             const data = await getTasks();
             setTasks(data);
         };
 
         fetchTasks();
+        
     },[])
+
+    useEffect( ()=>{
+        const handleBeforeUnload =async (e) => {
+        
+            console.log("ブラウザを閉じようとしている！");
+
+            if(groupedTasks["RUNNING"].length === 0) return;
+            const runTask = groupedTasks["RUNNING"][0]
+
+            stopTimer(runTask)
+            runTask.elapsedTime = elapsed
+            
+            if (runTask) {
+                localStorage.setItem("runningTaskBackup", JSON.stringify(runTask));
+            }
+
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    },[groupedTasks])
+
+
+
+
 
 
     //Create関数
-    const handleCreateTask = async (title,description) =>{
+    const handleCreateTask = async (taskTitle,taskDescription) =>{
         const startedAt = getCreatedAt();
-        const status = "TODO"   //初期値は"TODO"(未実施)
-        const time = 0
-        const resData = await postTask(title,description,startedAt,status,time)
+        const resData = await postTask(taskTitle,taskDescription,startedAt)
         setTasks((prevTasks) =>[...prevTasks,resData])
         closeModal();
     }
@@ -82,7 +111,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
         await deleteTask(taskId)
 
         setTasks( (prevTasks)=>prevTasks.filter( (task) =>{
-            return task.id !== taskId
+            return task.taskId !== taskId
         } ))
         closeModal();
     }
@@ -91,13 +120,12 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
     //Update関数 (引数は)
     const handleUpdateTask = async (taskId, argsObj={}) => {
         const sendData = {};
-        console.log(argsObj.time)
 
         //バリデーション処理
-        if (argsObj.title && argsObj.title.trim()) sendData.title = argsObj.title;
-        if (argsObj.description && argsObj.description.trim()) sendData.description = argsObj.description;
-        if (argsObj.time) sendData.time = argsObj.time;
-        if (argsObj.status && argsObj.status.trim()) sendData.status = argsObj.status;
+        if (argsObj.taskTitle && argsObj.taskTitle.trim()) sendData.taskTitle = argsObj.taskTitle;
+        if (argsObj.taskDescription && argsObj.taskDescription.trim()) sendData.taskDescription = argsObj.taskDescription;
+        if (argsObj.elapsedTime) sendData.elapsedTime = argsObj.elapsedTime;
+        if (argsObj.taskStatus && argsObj.taskStatus.trim()) sendData.taskStatus = argsObj.taskStatus;
         
         if (Object.keys(sendData).length === 0) {       //入力がされていないとき
             alert("更新内容が入力されていません");      
@@ -108,7 +136,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
         try {
             const resData = await patchTask(taskId, sendData);
             setTasks((prevTasks) => prevTasks.map( (task)=>{
-                if(task.id !== taskId) return task;
+                if(task.taskId !== taskId) return task;
                 return {...task,...resData};
             } ) )
             closeModal();
@@ -117,6 +145,19 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
             console.error(err);
         }
         };
+
+    useEffect( ()=>{
+        const buRunTask = localStorage.getItem("runningTaskBackup");
+        console.log("buRunTask/////"+buRunTask)
+        if(buRunTask){
+            console.log("入った")
+            const parsed = JSON.parse(buRunTask);
+            handleUpdateTask(parsed.taskId,{elapsedTime:parsed.elapsedTime,taskStatus:"PAUSE"})
+            
+            localStorage.removeItem("runningTaskBackup");
+        }
+
+    },[])
 
     return(
         <>
@@ -141,7 +182,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
                     groupedTasks["RUNNING"].map( (task)=>{
                         return(
                             <div className={style.cardContainer}>
-                            <TaskCard key={task.id} task={task} tasks={tasks} getOptions={getOptions} 
+                            <TaskCard key={task.taskId} task={task} tasks={tasks} getOptions={getOptions} 
                             handleUpdateTask={handleUpdateTask} 
                             isInCompletedTaskList={isInCompletedTaskList}>
                             </TaskCard>
@@ -158,7 +199,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
                     groupedTasks["PAUSE"].map( (task)=>{
                         return(
                             <div className={style.cardContainer}>
-                                <TaskCard key={task.id} task={task} tasks={tasks}  getOptions={getOptions}
+                                <TaskCard key={task.taskId} task={task} tasks={tasks}  getOptions={getOptions}
                             handleUpdateTask={handleUpdateTask} 
                             isInCompletedTaskList={isInCompletedTaskList}></TaskCard>
                             </div>
@@ -174,7 +215,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
                     groupedTasks["TODO"].map( (task)=>{
                         return(
                             <div className={style.cardContainer}>
-                            <TaskCard key={task.id} task={task} tasks={tasks}  getOptions={getOptions}
+                            <TaskCard key={task.taskId} task={task} tasks={tasks}  getOptions={getOptions}
                             handleUpdateTask={handleUpdateTask} 
                             isInCompletedTaskList={isInCompletedTaskList}>
                             </TaskCard>

@@ -4,13 +4,15 @@
 import axios from "axios";
 
 
-//const TGT_URL = "http://localhost:8080"; //開発用URL定数
-const TGT_URL = "http://localhost:3001/tasks"; //開発用URL定数
+const TGT_URL = "http://localhost:8080"; //開発用URL定数
+//const TGT_URL = "http://localhost:3001/tasks"; //開発用URL定数
 
 //GetAPI
 export const getTasks = async () =>{
+
     try {
         const response = await axios.get(`${TGT_URL}`)
+        console.log(response)
         return response.data; 
     } catch (error) {
         console.log(error);
@@ -18,9 +20,9 @@ export const getTasks = async () =>{
 }
 
 //PostAPI
-export const postTask = async (title,description,createdAt,status,time) =>{
+export const postTask = async (taskTitle,taskDescription,createdAt) =>{
     try {
-        const response = await axios.post(`${TGT_URL}`,{title,description,createdAt,status,time})
+        const response = await axios.post(`${TGT_URL}`,{taskTitle,taskDescription,createdAt})
         return response.data; 
     } catch (error) {
         console.log(error);
@@ -42,8 +44,8 @@ export const  putTask = async (taskId,newTitle,newDescription) =>{
     try {
         const response = await axios.put(`${TGT_URL}`+`/${taskId}`,
             {
-            title:newTitle,
-            description:newDescription
+            taskTitle:newTitle,
+            taskDescription:newDescription
             }
         )
         return response.data; 

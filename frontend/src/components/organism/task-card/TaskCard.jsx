@@ -17,22 +17,22 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
     const {openModal} = useModalControl(); 
     const {elapsed,getTime,startTimer,stopTimer} =useTaskTimer();
 
-    console.log(tasks)    
-
+    console.log(tasks) 
+    
     return(
         <>
             <div className={style.cardBox}>
-            <p>{`${task.title}`}</p>
+            <p>{`${task.taskTitle}`}</p>
             <ul>
                 <li>
                     <button 
                     title="開始"
                     className={style.icon}
                     onClick={  ()=>{
-                        const runTask = tasks.find( (task)=>task.status === "RUNNING" )   //作業中タスクが存在するかの確認 
+                        const runTask = tasks.find( (task)=>task.taskStatus === "RUNNING" )   //作業中タスクが存在するかの確認 
                         
                         //すでに開始状態であれば何もしない
-                        if (runTask && runTask.id === task.id) return;
+                        if (runTask && runTask.taskId === task.taskId) return;
 
                         //ほかタスクが開始状態ならば確認モーダル表示
                         if (runTask) {
@@ -42,7 +42,7 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
 
                         //作業中タスクがなければ、このタスクを開始
                         startTimer(task);
-                        handleUpdateTask(task.id, { status: "RUNNING" });
+                        handleUpdateTask(task.taskId, { taskStatus: "RUNNING" });
                     }
                     }>
                     <PlayArrowIcon/>
@@ -53,17 +53,17 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
                     title="中断"
                     className={style.icon}
                     onClick={()=>{
-                        const runTask = tasks.find( (task)=>task.status === "RUNNING" )   //作業中タスクが存在するかの確認 
+                        const runTask = tasks.find( (task)=>task.taskStatus === "RUNNING" )   //作業中タスクが存在するかの確認 
                         
                         //作業中のタスクが中断されたとき
-                        if (runTask && runTask.id === task.id){
+                        if (runTask && runTask.taskId === task.taskId){
                             stopTimer(task);
-                            handleUpdateTask(task.id, {time:elapsed, status: "PAUSE" });
+                            handleUpdateTask(task.taskId, {elapsedTime:elapsed, taskStatus: "PAUSE" });
                             return;
                         }
 
-                        //作業中タスクがなければ、指定タスクを中断
-                        handleUpdateTask(task.id, { status: "PAUSE" });
+                        //作業中タスクに該当しない場合、指定タスクを中断
+                        handleUpdateTask(task.taskId, { taskStatus: "PAUSE" });
                     }
                     }>
                     <PauseIcon/>
@@ -75,17 +75,17 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
                     title="完了"
                     className={style.icon}
                     onClick={()=>{
-                        const runTask = tasks.find( (task)=>task.status === "RUNNING" )   //作業中タスクが存在するかの確認 
+                        const runTask = tasks.find( (task)=>task.taskStatus === "RUNNING" )   //作業中タスクが存在するかの確認 
                         
                         //作業中のタスクが停止したとき
-                        if (runTask && runTask.id === task.id){
+                        if (runTask && runTask.taskId === task.taskId){
                             stopTimer(task);
-                            handleUpdateTask(task.id, {time:elapsed, status: "STOP" });
+                            handleUpdateTask(task.taskId, {elapsedTime:elapsed, taskStatus: "STOP" });
                             return;
                         }
 
                         //作業中タスクがなければ、このタスクを停止
-                        handleUpdateTask(task.id, { status: "STOP" });
+                        handleUpdateTask(task.taskId, { taskStatus: "STOP" });
                         }
                     }>
                     <StopIcon/>
