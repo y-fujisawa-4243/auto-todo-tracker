@@ -1,0 +1,23 @@
+
+.container{
+    text-align: center;
+}
+
+.container h2{
+    font-size: 2rem;
+}
+
+.container p{
+    font-size: 1rem;
+}
+
+
+/*ボタン*/
+.button{
+    background-color: rgb(138, 252, 198);
+    color: black;
+}
+
+.link{
+    text-decoration: none;
+}

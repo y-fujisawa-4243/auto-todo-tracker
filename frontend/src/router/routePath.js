@@ -10,7 +10,7 @@ const ROUTE_PATHS = {
     HOME: "/",
     LIST: "/list",
     COMPLETE:"/list/complete",
-    TASK_DETAIL: (id) => `/task/${id}`, // 動的パラメータにも対応！
+    NOT_FOUND:"*"
   };
 
   export default ROUTE_PATHS;

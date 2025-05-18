@@ -8,6 +8,7 @@ import auto_todo_tracker.model.entity.TaskEntity;
 import auto_todo_tracker.repository.SessionRepository;
 import auto_todo_tracker.repository.TaskRepository;
 import auto_todo_tracker.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,7 @@ public class TaskController {
 
     //POSTの窓口
     @PostMapping("/")
-    public TaskDTO createTask(@RequestBody PostTaskDTO postTaskDTO){
+    public TaskDTO createTask(@Valid  @RequestBody PostTaskDTO postTaskDTO){
         System.out.println("作成");
         return taskService.createTaskDTO(postTaskDTO);
     }
@@ -50,10 +51,17 @@ public class TaskController {
 
     //PATCHの窓口
     @PatchMapping("/{id}")
-    public TaskDTO patchTask(@PathVariable("id") Long taskId,@RequestBody PatchTaskDTO patchTaskDTO){
+    public TaskDTO patchTask(@PathVariable("id") Long taskId,
+                             @Valid @RequestBody PatchTaskDTO patchTaskDTO){
         System.out.println("更新/////"+ patchTaskDTO.taskStatus());
         System.out.println(taskService.patchTaskById(taskId,patchTaskDTO));
         return taskService.patchTaskById(taskId,patchTaskDTO);
+    }
+
+
+    @GetMapping("/500")
+    public void triggerInternalServerError() {
+        throw new RuntimeException("強制的に500エラーを発生させました");
     }
 
 

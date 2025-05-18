@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Setter
@@ -17,6 +19,6 @@ public class SessionEntity {
     @JoinColumn(name = "task_id", nullable = false, unique = true) //作業時間などは更新して管理する仕様のため、1対1でunique制約
     private TaskEntity task;
 
-    private String createdAt = "";
+    private LocalDate createdAt;
     private Integer elapsedTime = 0;
 }

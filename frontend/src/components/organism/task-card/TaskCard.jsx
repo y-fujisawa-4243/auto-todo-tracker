@@ -22,7 +22,7 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
     return(
         <>
             <div className={style.cardBox}>
-            <p>{`${task.taskTitle}`}</p>
+            <p className={style.taskTitle}>{`${task.taskTitle}`}</p>
             <ul>
                 <li>
                     <button 
@@ -95,7 +95,7 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
                 }
             </ul>
                 
-            <p>{getTime(task)}</p>
+            <p className={style.time}>{getTime(task)}</p>
             <KebabMenu task={task} tasks={tasks} getOptions={getOptions}></KebabMenu>
         </div>
         </>

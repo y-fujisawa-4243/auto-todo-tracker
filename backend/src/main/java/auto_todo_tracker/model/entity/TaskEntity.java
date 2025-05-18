@@ -13,10 +13,12 @@ public class TaskEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long taskId;
-
     private String taskTitle;
     private String taskDescription = "";
-    private String taskStatus = "TODO";
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10, nullable = false)
+    private TaskStatus taskStatus = TaskStatus.TODO;
 
     @OneToOne(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private SessionEntity session;

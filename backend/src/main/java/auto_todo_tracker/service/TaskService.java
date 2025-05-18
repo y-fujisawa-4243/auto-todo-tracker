@@ -1,21 +1,24 @@
 package auto_todo_tracker.service;
 
+import auto_todo_tracker.exception.BadRequestException;
+import auto_todo_tracker.exception.ConflictException;
+import auto_todo_tracker.exception.ResourceNotFoundException;
 import auto_todo_tracker.model.dto.PatchTaskDTO;
 import auto_todo_tracker.model.dto.PostTaskDTO;
 import auto_todo_tracker.model.dto.TaskDTO;
 import auto_todo_tracker.model.entity.SessionEntity;
 import auto_todo_tracker.model.entity.TaskEntity;
+import auto_todo_tracker.model.entity.TaskStatus;
+import auto_todo_tracker.model.entity.TaskWithSession;
 import auto_todo_tracker.repository.SessionRepository;
 import auto_todo_tracker.repository.TaskRepository;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.hibernate.Session;
+
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 
 @Service
 public class TaskService {
@@ -78,7 +81,7 @@ public class TaskService {
 
         //指定したIDに一致するタスクがあるか
         TaskEntity task = taskRepository.findById(taskId)
-                        .orElseThrow(() -> new EntityNotFoundException("タスクが見つかりません"));
+                        .orElseThrow(() -> new ResourceNotFoundException("指定されたタスクが見つかりません"));
 
         taskRepository.deleteById(taskId);
 
@@ -93,25 +96,71 @@ public class TaskService {
     //指定タスクの更新
     public TaskDTO patchTaskById(Long taskId,PatchTaskDTO patchTaskDTO) {
 
+        //バリデーション実施し、更新データを各Entityにまとめる。
+        TaskWithSession tws = validDataPatchRequest(taskId, patchTaskDTO);
+        return TaskDTO.toDTO(tws.getTaskEntity(),tws.getSessionEntity());
+
+    }
+
+
+    //PATCHリクエストに対するバリデーション処理
+    public TaskWithSession validDataPatchRequest(Long taskId,PatchTaskDTO patchTaskDTO){
+
+        final long MAX_ELAPSED_MS = 360_000_000L;
+
         //指定したIDに一致するタスクがあるか
         TaskEntity taskEntity = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("タスクが見つかりません"));
+                .orElseThrow(() -> new ResourceNotFoundException("指定されたタスクが見つかりません"));
 
         SessionEntity sessionEntity = taskEntity.getSession();
 
         //更新データがあるフィールドのみ更新
-        if (patchTaskDTO.taskTitle() != null) taskEntity.setTaskTitle(patchTaskDTO.taskTitle());
-        if (patchTaskDTO.taskDescription() != null) taskEntity.setTaskDescription(patchTaskDTO.taskDescription());
-        if (patchTaskDTO.taskStatus() != null) taskEntity.setTaskStatus(patchTaskDTO.taskStatus());
+        //タイトル
+        if (patchTaskDTO.taskTitle() != null){
+            if(patchTaskDTO.taskTitle().isBlank()){
+                throw new BadRequestException("※タイトルは必須です");
+            }
+            if(patchTaskDTO.taskTitle().length() >20){
+                throw new BadRequestException(("※タイトルは20文字以内で入力してください"));
+            }
+            taskEntity.setTaskTitle(patchTaskDTO.taskTitle());
+        }
 
-        if(patchTaskDTO.createdAt() != null) sessionEntity.setCreatedAt(patchTaskDTO.createdAt());
-        if(patchTaskDTO.elapsedTime() != 0) sessionEntity.setElapsedTime(patchTaskDTO.elapsedTime());
+        //説明
+        if (patchTaskDTO.taskDescription() != null){
+            if(patchTaskDTO.taskDescription().length() >256){
+                throw new BadRequestException(("※説明は256文字以内で入力してください"));
+            }
+            taskEntity.setTaskDescription(patchTaskDTO.taskDescription());
+        }
+
+        //taskStatusがRUNNING かつ 他にもRUNNINGのタスクが存在する場合はエラー
+        if (patchTaskDTO.taskStatus() != null){
+            if(patchTaskDTO.taskStatus() == TaskStatus.RUNNING &&
+                    taskRepository.existsByTaskStatusAndTaskIdNot(TaskStatus.RUNNING,taskId)){
+                throw  new ConflictException("作業中タスクがほかに存在します");
+            }
+            taskEntity.setTaskStatus(patchTaskDTO.taskStatus());
+        }
+
+
+        //計測
+        if(patchTaskDTO.elapsedTime() != 0) {
+            if (patchTaskDTO.elapsedTime() < 0) {
+                throw new BadRequestException("※計測時間[ms]はマイナスになりません");
+            }
+
+            if (patchTaskDTO.elapsedTime() > MAX_ELAPSED_MS ) {     //360,000,000ms = 99h 59m 59s
+                throw new BadRequestException("※計測できる時間の限界に達しました");
+            }
+
+            sessionEntity.setElapsedTime(patchTaskDTO.elapsedTime());
+        }
 
         //保存
         TaskEntity newTaskEntity = taskRepository.save(taskEntity);
         SessionEntity newSessionEntity = sessionRepository.save(sessionEntity);
 
-        return TaskDTO.toDTO(newTaskEntity,newSessionEntity);
-
+        return new TaskWithSession(newTaskEntity,newSessionEntity);
     }
 }

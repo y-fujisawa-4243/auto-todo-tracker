@@ -13,7 +13,7 @@ const Home = () =>{
 
     return(
         <div className={style.container}>
-            <h1>ToDoアプリ</h1>
+            <h1>TrackDo</h1>
             <p>タスクと一緒に作業時間も管理しましょう</p>
             <button 
                 onClick={()=>navigate(ROUTE_PATHS.LIST)}

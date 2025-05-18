@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SessionRepository extends JpaRepository <SessionEntity,Long> {
-    //基本的なCRUD操作のみ
+    //基本的なCRUD操作は未記載でOK
 }

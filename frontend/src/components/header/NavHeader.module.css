@@ -1,6 +1,7 @@
 .container{
     width: 48rem;
     margin: 0px auto;
+
 }
 
 .wrapper{
@@ -9,6 +10,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.wrapper h2{
+    font-size: 2rem;
+}
+
+.wrapper nav{
+    font-size: 1.1rem;
 }
 
 .ui{
@@ -20,5 +29,10 @@
     display: inline-block;
     margin: 0px 1rem;
     text-decoration: none;
-    color: grey;
+    color: rgb(100, 100, 100);
+}
+
+.link:hover{
+    text-decoration: underline;
+    color: rgb(40, 40, 40);
 }

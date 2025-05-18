@@ -15,7 +15,7 @@ const CheckStartTask = ({tasks,handleUpdateTask}) =>{
     return(
         <>
             <div className={style.formBox}>
-                <h3>現在作業中のタスクが中断しますが、よろしいでしょうか？</h3>
+                <h3>現在進捗中のタスクが中断しますが、<br/>よろしいでしょうか？</h3>
                 <div className={style.btnWrap}>
                     <button 
                     onClick={()=>closeModal()}

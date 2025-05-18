@@ -9,37 +9,20 @@ const TGT_URL = "http://localhost:8080"; //開発用URL定数
 
 //GetAPI
 export const getTasks = async () =>{
-
-    try {
-        const response = await axios.get(`${TGT_URL}`)
-        console.log(response)
-        return response.data; 
-    } catch (error) {
-        console.log(error);
-    }
+    return await axios.get(`${TGT_URL}`)
 }
 
 //PostAPI
 export const postTask = async (taskTitle,taskDescription,createdAt) =>{
-    try {
-        const response = await axios.post(`${TGT_URL}`,{taskTitle,taskDescription,createdAt})
-        return response.data; 
-    } catch (error) {
-        console.log(error);
-    }
+    return await axios.post(`${TGT_URL}`,{taskTitle,taskDescription,createdAt})
 }
 
 //DeleteAPI
 export const deleteTask = async (taskId) =>{
-    try {
-        await axios.delete(`${TGT_URL}`+`/${taskId}`)
-        console.log(taskId)
-    } catch (error) {
-        console.log(error);
-    }
+    return await axios.delete(`${TGT_URL}`+`/${taskId}`)
 }
 
-//PutAPI
+/*PutAPI
 export const  putTask = async (taskId,newTitle,newDescription) =>{
     try {
         const response = await axios.put(`${TGT_URL}`+`/${taskId}`,
@@ -53,13 +36,10 @@ export const  putTask = async (taskId,newTitle,newDescription) =>{
         console.log(error);
     }
 } 
+    */
 
 //PatchAPI
 export const patchTask = async (taskId, sendData) => {
-    try {
-        const response = await axios.patch(`${TGT_URL}/${taskId}`, sendData);
-        return response.data;
-    } catch (error) {
-        console.error(error);
-    }
-    }
+    return await axios.patch(`${TGT_URL}/${taskId}`, sendData);
+}
+    

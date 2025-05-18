@@ -25,8 +25,6 @@ const TaskDetail = () =>{
                     <dt><b>作成日</b></dt>
                     <dd>{currentTask.createdAt}</dd>
                 </dl>
-   
-
             </div>
             <div className={style.btnWrap}>
                 <button

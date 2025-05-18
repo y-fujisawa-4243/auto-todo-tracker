@@ -2,14 +2,17 @@ package auto_todo_tracker.model.dto;
 
 import auto_todo_tracker.model.entity.SessionEntity;
 import auto_todo_tracker.model.entity.TaskEntity;
+import auto_todo_tracker.model.entity.TaskStatus;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 //PATCH要求受け取り用DTO
 public record PatchTaskDTO(
         long taskId,
         String taskTitle,
         String taskDescription,
-        String taskStatus,
         String createdAt,
+        TaskStatus taskStatus,
         int elapsedTime
 ) {
 

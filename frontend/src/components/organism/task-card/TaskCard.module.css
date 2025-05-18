@@ -7,15 +7,11 @@
     grid-template-columns: 6fr 2fr 1fr 1fr;
     
     align-items: center; 
-    border: solid 1px rgb(197, 197, 197);
+    border: solid 1px rgb(215, 215, 215);
     border-radius: 6px;
-    background-color: rgb(255, 255, 255);
-}
+    background-color: rgb(235,235, 235);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 
-.cardBox p{
-    display: inline-block;
-    max-height: 20px;
-    margin: 0px 1rem;
 }
 
 .cardBox ul{
@@ -29,7 +25,26 @@
 }
 
 .cardBox:hover{
-    background-color:yellow;
+    background-color:rgb(226, 255, 254)
+}
+
+.taskTitle{
+    color: rgb(80, 80, 80);
+    font-weight: 700;
+    display: inline-block;
+    max-height: 20px;
+    margin: 0px 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.time{
+    color: rgb(80, 80, 80);
+    font-weight: 700;
+    display: inline-block;
+    max-height: 20px;
+    margin: 0px 1rem;
 }
 
 
@@ -41,11 +56,18 @@
     width: 28px;     
     height: 28px;
     cursor: pointer;
-    color: black;
+    color:  black;
     background-color: white;
     border: solid 1px grey;
     border-radius: 10px;
 }
+
+.icon:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+
 
 
 /*ケバブメニュー設定*/
@@ -57,11 +79,15 @@
     height: 28px;
     cursor: pointer;
     color: black;
-    background-color: white;
+    background-color: rgb(255,255,255);
     border: solid 1px grey;
     border-radius: 10px;
 }
 
 .kebabMenu svg{
     font-size: 20px;
+}
+
+.kebabMenu:hover{
+    transform: scale(1.05);
 }

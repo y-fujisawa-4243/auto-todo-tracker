@@ -11,7 +11,7 @@ const NavHeader = () =>{
         <>
         <div className={style.container}>
             <headre className={style.wrapper}>
-                <h2>ToDoアプリ</h2>
+                <h2>TrackDo</h2>
                 <ul className={style.ui}>
                     <li>
                         <nav><Link to={ROUTE_PATHS.HOME} className={style.link}>ホーム</Link></nav>
@@ -24,7 +24,7 @@ const NavHeader = () =>{
                     </li>
                 </ul>
             </headre>
-            </div>
+        </div>
         </>
     )
 

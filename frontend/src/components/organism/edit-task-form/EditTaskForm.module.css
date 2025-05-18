@@ -7,6 +7,7 @@
 
 .container h3{
     text-align: center;
+    font-size: 1.4rem;
     margin: 2rem auto 1rem;
 }
 
@@ -39,8 +40,15 @@
 }
 
 .formBox label {
+    font-size: 1.1rem;
+    font-weight: 700;
     text-align: left;
     margin-bottom: 5px;
+}
+
+.errorMsg{
+    color: red;
+    font-weight: 700;
 }
 
 

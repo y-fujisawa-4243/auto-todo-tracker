@@ -1,5 +1,6 @@
 //ライブラリ
 import { useEffect, useState ,useContext} from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useModalControl } from '../../../context/ModalControlProvider';
 
 //コンポーネント
@@ -28,6 +29,8 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
 
     const {isOpen,modalType,openModal,closeModal} = useModalControl(); 
     const {stopTimer,elapsed} = useTaskTimer();
+
+    const navigate = useNavigate();
 
 
     //タスクのグルーピング処理
@@ -60,8 +63,13 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
     useEffect( ()=>{
 
         const fetchTasks = async () => {
-            const data = await getTasks();
-            setTasks(data);
+            try {
+                const response = await getTasks();
+                setTasks(response.data);
+            } catch (error) {
+                console.log(error)
+            }
+
         };
 
         fetchTasks();
@@ -96,13 +104,20 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
 
 
 
-
     //Create関数
     const handleCreateTask = async (taskTitle,taskDescription) =>{
+
         const startedAt = getCreatedAt();
-        const resData = await postTask(taskTitle,taskDescription,startedAt)
-        setTasks((prevTasks) =>[...prevTasks,resData])
-        closeModal();
+        console.log(startedAt)
+
+        try {
+            const response = await postTask(taskTitle,taskDescription,startedAt)
+            setTasks((prevTasks) =>[...prevTasks,response.data])
+            closeModal();
+        } catch (error) {
+            console.log(error);
+        }
+
     }
 
 
@@ -121,28 +136,30 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
     const handleUpdateTask = async (taskId, argsObj={}) => {
         const sendData = {};
 
-        //バリデーション処理
-        if (argsObj.taskTitle && argsObj.taskTitle.trim()) sendData.taskTitle = argsObj.taskTitle;
-        if (argsObj.taskDescription && argsObj.taskDescription.trim()) sendData.taskDescription = argsObj.taskDescription;
+        //引数解析
+        if (argsObj.taskTitle ) sendData.taskTitle = argsObj.taskTitle;
+        if (argsObj.taskDescription ) sendData.taskDescription = argsObj.taskDescription;
         if (argsObj.elapsedTime) sendData.elapsedTime = argsObj.elapsedTime;
-        if (argsObj.taskStatus && argsObj.taskStatus.trim()) sendData.taskStatus = argsObj.taskStatus;
+        if (argsObj.taskStatus) sendData.taskStatus = argsObj.taskStatus;
         
-        if (Object.keys(sendData).length === 0) {       //入力がされていないとき
-            alert("更新内容が入力されていません");      
+        if (Object.keys(sendData).length === 0) {       //入力がされていないとき     
             return;
         }
+
+        console.log(`タスクステータス${sendData.taskStatus}`);
         
         //送信処理
         try {
-            const resData = await patchTask(taskId, sendData);
+            const response = await patchTask(taskId, sendData);
+            console.log(`タスクdata${response.data}`);
             setTasks((prevTasks) => prevTasks.map( (task)=>{
                 if(task.taskId !== taskId) return task;
-                return {...task,...resData};
+                return {...task,...response.data};
             } ) )
             closeModal();
 
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
         }
         };
 
@@ -226,7 +243,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
                 </section>
                 </>
                 ):(
-                <section className={style.taskField}>
+                <section className={cx(style.taskField,style.compTakField)}>
                     <h3>完了</h3> 
                     {groupedTasks["STOP"].length===0 ? (
                         <p className={style.notTaskMessage}>該当タスクは存在しません</p>

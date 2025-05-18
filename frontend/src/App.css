@@ -1,13 +1,15 @@
-body{
-    background:rgb(228, 228, 228)
+body {
+    background-color: rgb(215, 215, 215); 
+    margin: 0;
+    font-family: 'Noto Sans JP', sans-serif; 
 }
 
-.container{
-    width: 100%;
-    max-width: 60rem;
-    margin: 0px auto;
-}
-
-.container p{
-    font-size: 14px;
+.container {
+    max-width: 900px;
+    min-height: 900px;
+    margin: 3rem auto;
+    padding: 3rem;
+    background-color: white; 
+    border-radius: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
 }

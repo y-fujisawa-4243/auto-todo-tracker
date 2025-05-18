@@ -14,7 +14,7 @@
 .uniqueBtn{
     background-color: rgb(73, 73, 73);
     color: white;
-
+    font-size: 1.0rem;
 }
 
 .taskField{
@@ -30,6 +30,7 @@
 }
 
 .taskField h3{
+    font-size: 1.4rem;
     border-bottom: solid 2px grey;
 }
 

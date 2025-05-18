@@ -2,15 +2,18 @@ package auto_todo_tracker.model.dto;
 
 import auto_todo_tracker.model.entity.SessionEntity;
 import auto_todo_tracker.model.entity.TaskEntity;
+import auto_todo_tracker.model.entity.TaskStatus;
 import jakarta.persistence.Entity;
+
+import java.time.LocalDate;
 
 //フロント返送用DTO
 public record TaskDTO (
         long taskId,
         String taskTitle,
         String taskDescription,
-        String taskStatus,
-        String createdAt,
+        TaskStatus taskStatus,
+        LocalDate createdAt,
         int elapsedTime
 ) {
 

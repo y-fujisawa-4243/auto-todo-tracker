@@ -9,13 +9,18 @@
 /*項目名*/
 .formBox h3{
     text-align: center;
+    font-size: 1.4rem;
+}
+
+.formBox dt{
+    font-size: 1.1rem;
+    font-weight: 700;
 }
 
 .formBox dd{
-    font-size: 14px;
+    font-size: 1.1rem;
     width: 100%;
     margin-bottom: 1rem;
-    white-space:pre-line;
 }
 
 

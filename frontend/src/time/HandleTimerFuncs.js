@@ -10,10 +10,10 @@ export const getCreatedAt = () =>{
     const d = new Date();
 
     const year = d.getFullYear();
-    const month = d.getMonth()+1;   //0~11の範囲で返送されるため、+1処理。
+    const month = String(d.getMonth()+1).padStart(2, "0");   //0~11の範囲で返送されるため、+1処理。10月より前ならば0をつける。
     const date = d.getDate();
 
-    return `${year}年${month}月${date}日`;
+    return `${year}-${month}-${date}`;
 
 }
 
