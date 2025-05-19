@@ -5,13 +5,17 @@ import auto_todo_tracker.model.dto.PostTaskDTO;
 import auto_todo_tracker.model.dto.TaskDTO;
 import auto_todo_tracker.model.entity.SessionEntity;
 import auto_todo_tracker.model.entity.TaskEntity;
+import auto_todo_tracker.model.entity.TaskStatus;
 import auto_todo_tracker.repository.SessionRepository;
 import auto_todo_tracker.repository.TaskRepository;
 import auto_todo_tracker.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -56,6 +60,20 @@ public class TaskController {
         System.out.println("更新/////"+ patchTaskDTO.taskStatus());
         System.out.println(taskService.patchTaskById(taskId,patchTaskDTO));
         return taskService.patchTaskById(taskId,patchTaskDTO);
+    }
+
+//--------------------------------------------------------------------------------
+    @PostMapping("/list/test")
+    public void generateTestTasks(@RequestParam(defaultValue = "50") int count) {
+        for (int i = 1; i <= count; i++) {
+            PostTaskDTO task = new PostTaskDTO(
+                    "テストタスク " + i,
+                    "これはテストデータです",
+                    LocalDate.now());
+
+            createTask(task);
+        }
+
     }
 
 

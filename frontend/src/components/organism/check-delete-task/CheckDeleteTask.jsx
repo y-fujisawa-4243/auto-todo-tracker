@@ -21,7 +21,7 @@ const CheckDeleteTask = ({handleDeleteTask}) =>{
                     <button 
                     onClick={()=>closeModal()}
                     className={cx(baseStyle.baseBtn,style.cancelBtn)}    
-                    >いいえ</button>
+                    >キャンセル</button>
                     <button 
                     onClick={() => {
                         stopTimer(currentTask)
@@ -29,7 +29,7 @@ const CheckDeleteTask = ({handleDeleteTask}) =>{
                     }
                     }
                     className={cx(baseStyle.baseBtn,style.createBtn)}                       
-                    >はい</button>
+                    >削除する</button>
                  </div>
             </div>
         </>

@@ -4,9 +4,15 @@ import {useState,createContext} from "react";
 import  "./App.css";
 import { ModalControlProvider } from "./context/ModalControlProvider";
 import { TaskTimerProvider }  from "./context/TaskTimerProvider";
-import { UserApiErrorProvider } from "./context/UserApiErrorProvider";
+import DoneIcon from '@mui/icons-material/Done';
+import axios from "axios";
 
 
+
+const generateTestData = async () => {
+  await axios.post("http://localhost:8080/list/test", { count: 50 });
+  alert("テストデータを生成しました");
+};
 
 
 function App() {
@@ -14,13 +20,12 @@ function App() {
   return(
     <div className="container">
 
-      <UserApiErrorProvider>
         <TaskTimerProvider>
           <ModalControlProvider>
             <Routing/>
           </ ModalControlProvider>
         </TaskTimerProvider>
-      </UserApiErrorProvider>
+        <button onClick={() => generateTestData()}>test</button>
     </div>
 
     

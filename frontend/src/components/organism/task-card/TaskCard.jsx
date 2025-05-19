@@ -4,13 +4,10 @@ import style from "./TaskCard.module.css";
 /*MUI*/
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'; 
 import PauseIcon from '@mui/icons-material/Pause';
-import StopIcon from '@mui/icons-material/Stop';
 
-import { HandleTimerFuncs } from "../../../time/HandleTimerFuncs";
-import { useState,useEffect,useRef ,useContext} from "react";
 import { useModalControl } from "../../../context/ModalControlProvider";
 import {useTaskTimer} from "../../../context/TaskTimerProvider"
-import { ReceiptRussianRuble } from "lucide-react";
+import DoneIcon from '@mui/icons-material/Done';
 
 const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}) =>{
 
@@ -22,58 +19,13 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
     return(
         <>
             <div className={style.cardBox}>
-            <p className={style.taskTitle}>{`${task.taskTitle}`}</p>
+
             <ul>
                 <li>
-                    <button 
-                    title="開始"
-                    className={style.icon}
-                    onClick={  ()=>{
-                        const runTask = tasks.find( (task)=>task.taskStatus === "RUNNING" )   //作業中タスクが存在するかの確認 
-                        
-                        //すでに開始状態であれば何もしない
-                        if (runTask && runTask.taskId === task.taskId) return;
-
-                        //ほかタスクが開始状態ならば確認モーダル表示
-                        if (runTask) {
-                            openModal("START", task);
-                            return;
-                        }
-
-                        //作業中タスクがなければ、このタスクを開始
-                        startTimer(task);
-                        handleUpdateTask(task.taskId, { taskStatus: "RUNNING" });
-                    }
-                    }>
-                    <PlayArrowIcon/>
-                    </button>
-                </li>
-                <li>
-                    <button 
-                    title="中断"
-                    className={style.icon}
-                    onClick={()=>{
-                        const runTask = tasks.find( (task)=>task.taskStatus === "RUNNING" )   //作業中タスクが存在するかの確認 
-                        
-                        //作業中のタスクが中断されたとき
-                        if (runTask && runTask.taskId === task.taskId){
-                            stopTimer(task);
-                            handleUpdateTask(task.taskId, {elapsedTime:elapsed, taskStatus: "PAUSE" });
-                            return;
-                        }
-
-                        //作業中タスクに該当しない場合、指定タスクを中断
-                        handleUpdateTask(task.taskId, { taskStatus: "PAUSE" });
-                    }
-                    }>
-                    <PauseIcon/>
-                    </button>
-                </li>
                 {isInCompletedTaskList ? (
-                <li>
                     <button 
                     title="完了"
-                    className={style.icon}
+                    className={style.nomalDoneIcon}
                     onClick={()=>{
                         const runTask = tasks.find( (task)=>task.taskStatus === "RUNNING" )   //作業中タスクが存在するかの確認 
                         
@@ -88,13 +40,65 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
                         handleUpdateTask(task.taskId, { taskStatus: "STOP" });
                         }
                     }>
-                    <StopIcon/>
                     </button>
-                </li>
-                ):null
+                ):(   
+                    <button 
+                    title="リトライ"
+                    className={style.checkDoneIcon}
+                    onClick={()=>{
+                        const runTask = tasks.find( (task)=>task.taskStatus === "RUNNING" )   //作業中タスクが存在するかの確認 
+
+                        //タスクを未実施へ復帰
+                        handleUpdateTask(task.taskId, { taskStatus: "TODO" });
+                        }
+                    }>
+                    <DoneIcon/>
+                    </button>                    
+                )
                 }
+                </li>
+                <li>
+                {isInCompletedTaskList && (
+                    task.taskStatus === "RUNNING" ? (
+                    <button
+                        title="中断"
+                        className={style.pauseIcon}
+                        onClick={() => {
+                        const runTask = tasks.find((task) => task.taskStatus === "RUNNING");
+                        if (runTask && runTask.taskId === task.taskId) {
+                            stopTimer(task);
+                            handleUpdateTask(task.taskId, { elapsedTime: elapsed, taskStatus: "PAUSE" });
+                            return;
+                        }
+                        handleUpdateTask(task.taskId, { taskStatus: "PAUSE" });
+                        }}
+                    >
+                        <PauseIcon />
+                    </button>
+                    ) : (
+                    <button
+                        title="開始"
+                        className={style.startIcon}
+                        onClick={() => {
+                        const runTask = tasks.find((task) => task.taskStatus === "RUNNING");
+                        if (runTask && runTask.taskId === task.taskId) return;
+                        if (runTask) {
+                            openModal("START", task);
+                            return;
+                        }
+                        startTimer(task);
+                        handleUpdateTask(task.taskId, { taskStatus: "RUNNING" });
+                        }}
+                    >
+                        <PlayArrowIcon />
+                    </button>
+                    )
+                )}
+                </li>
+
+
             </ul>
-                
+            <p className={style.taskTitle}>{`${task.taskTitle}`}</p>
             <p className={style.time}>{getTime(task)}</p>
             <KebabMenu task={task} tasks={tasks} getOptions={getOptions}></KebabMenu>
         </div>

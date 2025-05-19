@@ -22,6 +22,7 @@ import baseStyle from "../../../style/Util.module.css"
 import { postTask,deleteTask, getTasks,patchTask} from "../../../api/taskApi";
 import { getCreatedAt } from '../../../time/HandleTimerFuncs';
 import { useTaskTimer } from '../../../context/TaskTimerProvider';
+import TaskOver from '../../organism/task-over/TaskOver';
 
 
 
@@ -29,8 +30,6 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
 
     const {isOpen,modalType,openModal,closeModal} = useModalControl(); 
     const {stopTimer,elapsed} = useTaskTimer();
-
-    const navigate = useNavigate();
 
 
     //タスクのグルーピング処理
@@ -59,7 +58,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
         }
     )
 
-        //立ち上げ時データ取得
+    //立ち上げ時データ取得
     useEffect( ()=>{
 
         const fetchTasks = async () => {
@@ -101,11 +100,14 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
     },[groupedTasks])
 
 
-
-
-
     //Create関数
     const handleCreateTask = async (taskTitle,taskDescription) =>{
+
+        if(Object.keys(tasks).length >= 50){
+            closeModal();
+            openModal("TASK_OVER");
+            return;
+        } 
 
         const startedAt = getCreatedAt();
         console.log(startedAt)
@@ -135,11 +137,18 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
     //Update関数 (引数は)
     const handleUpdateTask = async (taskId, argsObj={}) => {
         const sendData = {};
+        const MAX_ELAPSED_SEC = 359999;
 
         //引数解析
         if (argsObj.taskTitle ) sendData.taskTitle = argsObj.taskTitle;
         if (argsObj.taskDescription ) sendData.taskDescription = argsObj.taskDescription;
-        if (argsObj.elapsedTime) sendData.elapsedTime = argsObj.elapsedTime;
+        if (argsObj.elapsedTime){
+            if(argsObj.elapsedTime  > MAX_ELAPSED_SEC) {
+                sendData.elapsedTime = MAX_ELAPSED_SEC
+            }else{
+                sendData.elapsedTime = argsObj.elapsedTime
+            }
+        } 
         if (argsObj.taskStatus) sendData.taskStatus = argsObj.taskStatus;
         
         if (Object.keys(sendData).length === 0) {       //入力がされていないとき     
@@ -291,7 +300,13 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
                     <ModalForm>
                         <CheckStartTask tasks={tasks} handleUpdateTask={handleUpdateTask}/>
                     </ModalForm>
-                        ) :
+                    ) :
+
+                    modalType === "TASK_OVER" ? (
+                    <ModalForm>
+                        <TaskOver />
+                    </ModalForm>
+                    ) :
 
                     null
                     )

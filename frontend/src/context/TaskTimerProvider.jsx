@@ -32,26 +32,7 @@ export const TaskTimerProvider = ({children}) => {
         }, 1000);                                
     };
     
-
-    //タイマー停止関数
-    const stopTimer = (task) => {
-
-        console.log("停止")
-        console.log(intervalRef.current)
-        console.log(task.taskId)
-
-        //未計測または他タスクの停止指示の場合、何もしない。
-        if(!intervalRef.current ||runTaskIdRef.current !== task.taskId ) return;
-
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-        runTaskIdRef.current = null;
-
-        console.log("保存")
-        setElapsed(elapsed)
-    };
-
-
+    
     //タイマー切り替え関数
     const switchTaskTimer = (task) => {
 
@@ -67,10 +48,31 @@ export const TaskTimerProvider = ({children}) => {
         setElapsed(elapsed)        
     };
 
+
+    //タイマー停止関数
+    const stopTimer = (task) => {
+
+        //未計測または他タスクの停止指示の場合、何もしない。
+        if(!intervalRef.current ||runTaskIdRef.current !== task.taskId ) return;
+
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+        runTaskIdRef.current = null;
+
+        console.log("保存")
+        setElapsed(elapsed)
+
+    };
+
     
     //フォーマット変換関数
-    const format = (elapsedSec) => {
-        if(elapsedSec===0) return"00:00:00"
+    const format = (elapsed) => {
+
+        if(elapsed===0) return"00:00:00"
+
+        //359999sec = 99h59m59s を上限とし、それ以降は描画しない(計測はStopまで続ける)
+        const MAX_ELAPSED_SEC = 359999;
+        const elapsedSec = Math.min(elapsed, MAX_ELAPSED_SEC);
 
         const hour = String(Math.floor(elapsedSec / 3600)).padStart(2, '0');
         const min = String(Math.floor((elapsedSec % 3600) / 60)).padStart(2, '0');
@@ -86,9 +88,6 @@ export const TaskTimerProvider = ({children}) => {
             return format(task.elapsedTime);
         }
     }
-
-
-
 
 
     return(

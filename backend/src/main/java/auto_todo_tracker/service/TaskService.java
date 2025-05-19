@@ -3,6 +3,7 @@ package auto_todo_tracker.service;
 import auto_todo_tracker.exception.BadRequestException;
 import auto_todo_tracker.exception.ConflictException;
 import auto_todo_tracker.exception.ResourceNotFoundException;
+import auto_todo_tracker.exception.TaskLimitException;
 import auto_todo_tracker.model.dto.PatchTaskDTO;
 import auto_todo_tracker.model.dto.PostTaskDTO;
 import auto_todo_tracker.model.dto.TaskDTO;
@@ -57,6 +58,11 @@ public class TaskService {
     //新規タスクの追加
     public TaskDTO createTaskDTO(PostTaskDTO postTaskDTO){
 
+        long count = taskRepository.count();;
+        if(count >= 50){
+            throw new TaskLimitException("タスク数が上限に達しています。");
+        }
+
         //DTO ⇒ Entityに変換し保存
         TaskEntity taskEntity = postTaskDTO.toTaskEntity();
         SessionEntity sessionEntity = postTaskDTO.toSessionEntity();
@@ -106,7 +112,7 @@ public class TaskService {
     //PATCHリクエストに対するバリデーション処理
     public TaskWithSession validDataPatchRequest(Long taskId,PatchTaskDTO patchTaskDTO){
 
-        final long MAX_ELAPSED_MS = 360_000_000L;
+        final long MAX_ELAPSED_SEC = 359_999L;
 
         //指定したIDに一致するタスクがあるか
         TaskEntity taskEntity = taskRepository.findById(taskId)
@@ -145,12 +151,13 @@ public class TaskService {
 
 
         //計測
+        System.out.println(patchTaskDTO.elapsedTime() );
         if(patchTaskDTO.elapsedTime() != 0) {
             if (patchTaskDTO.elapsedTime() < 0) {
                 throw new BadRequestException("※計測時間[ms]はマイナスになりません");
             }
 
-            if (patchTaskDTO.elapsedTime() > MAX_ELAPSED_MS ) {     //360,000,000ms = 99h 59m 59s
+            if (patchTaskDTO.elapsedTime() > MAX_ELAPSED_SEC ) {     //359,999 = 99h59m59s
                 throw new BadRequestException("※計測できる時間の限界に達しました");
             }
 

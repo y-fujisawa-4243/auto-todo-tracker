@@ -40,11 +40,20 @@ public class GlobalExceptionHandler {
     }
 
 
-    //409 Conflictのエラーハンドリング (ConflictExceptionは自作例外クラス)
+    //409 Conflict(ステータス重複起因)のエラーハンドリング (ConflictExceptionは自作例外クラス)
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ErrorResDTO> handleConflict (ConflictException err){
         System.out.println("409");
         ErrorResDTO errorResDTO = new ErrorResDTO("CONFLICT", err.getMessage());
+        return new ResponseEntity<>(errorResDTO,HttpStatus.CONFLICT);
+    }
+
+
+    //409 Conflict(タスク数超過)のエラーハンドリング (ConflictExceptionは自作例外クラス)
+    @ExceptionHandler(TaskLimitException.class)
+    public ResponseEntity<ErrorResDTO> handleTaskLimit (TaskLimitException err){
+        System.out.println("409");
+        ErrorResDTO errorResDTO = new ErrorResDTO("TASK_LIMIT", err.getMessage());
         return new ResponseEntity<>(errorResDTO,HttpStatus.CONFLICT);
     }
 
