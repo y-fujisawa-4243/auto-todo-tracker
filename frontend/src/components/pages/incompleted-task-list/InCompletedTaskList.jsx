@@ -7,7 +7,7 @@ import  BaseTaskList  from '../../layouts/base-task-list/BaseTaskList';
 
 const InCompletedTaskList = ({tasks,setTasks}) => {
 
-    const {openModal} = useModalControl();     
+    const {openModal} = useModalControl();  
 
     //KebabMenu表示用関数
     const getOptions = (task,tasks) =>{

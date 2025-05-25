@@ -18,6 +18,8 @@ const EditTaskForm = ({handleUpdateTask}) =>{
         taskDescription:""
     });
 
+    const [isSubmit,setIsSubmit] = useState(false);
+
     const handleValidateInput = (title,description) => {
         const errors = {};
 
@@ -38,7 +40,7 @@ const EditTaskForm = ({handleUpdateTask}) =>{
     return(
         <div className={style.container}>
             <h3>タスク編集フォーム</h3>
-            <form>
+            <div>
                 <div className={style.formBox}>
                     <label>タスク名</label>
                     <input
@@ -61,7 +63,7 @@ const EditTaskForm = ({handleUpdateTask}) =>{
                     <p className={style.errorMsg}>{inputError.taskDescription}</p>
                     )}
                 </div>
-            </form>
+            </div>
             
             <div className={style.btnWrap}>
                 <button 
@@ -73,14 +75,21 @@ const EditTaskForm = ({handleUpdateTask}) =>{
                     type="submit" 
                     onClick={()=>{
 
-                    const errors = handleValidateInput(title,description);
+                        //多重送信防止
+                        if(isSubmit) return;
+                        setIsSubmit(true)
 
-                    if(Object.keys(errors).length > 0){
-                        setInputError(errors);
-                        return;
-                    }
-                    setInputError({}); 
-                    handleUpdateTask(currentTask.taskId,{taskTitle:title,taskDescription:description})
+                        //バリデーション    
+                        const errors = handleValidateInput(title,description);
+                        if(Object.keys(errors).length > 0){
+                            setInputError(errors);
+                            setIsSubmit(false);
+                            return;
+                        }
+                        setInputError({});
+
+                        //送信
+                        handleUpdateTask(currentTask.taskId,{taskTitle:title,taskDescription:description})
                     }}
                     className={cx(baseStyle.baseBtn,style.createBtn)}
                     >保存

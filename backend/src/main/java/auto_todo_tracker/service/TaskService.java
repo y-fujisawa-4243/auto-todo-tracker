@@ -170,4 +170,8 @@ public class TaskService {
 
         return new TaskWithSession(newTaskEntity,newSessionEntity);
     }
+
+    public void deleteTask() {
+        taskRepository.deleteAll();
+    }
 }

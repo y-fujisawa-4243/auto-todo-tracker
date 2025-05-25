@@ -13,7 +13,11 @@ public class TaskEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long taskId;
+
+    @Column(length = 20,nullable = false)
     private String taskTitle;
+
+    @Column(length = 256)
     private String taskDescription = "";
 
     @Enumerated(EnumType.STRING)

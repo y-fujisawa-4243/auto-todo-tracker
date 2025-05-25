@@ -18,6 +18,8 @@ const CreataeTaskForm = ({handleCreateTask}) =>{
         taskDescription:""
     });
 
+    const [isSubmit,setIsSubmit] = useState(false);
+
     const handleValidateInput = (title,description) => {
         const errors = {};
 
@@ -38,7 +40,7 @@ const CreataeTaskForm = ({handleCreateTask}) =>{
     return(
         <div className={style.container}>
         <h3>新規タスク作成フォーム</h3>
-        <form>
+        <div>
             <div className={style.formBox}>
                 <label>タスク名</label>
                 <input
@@ -60,7 +62,7 @@ const CreataeTaskForm = ({handleCreateTask}) =>{
                     <p className={style.errorMsg}>{inputError.taskDescription}</p>
                 )}
             </div>
-        </form>
+        </div>
          <div className={style.btnWrap}>
             <button 
                 onClick={() => closeModal()}
@@ -71,13 +73,20 @@ const CreataeTaskForm = ({handleCreateTask}) =>{
                 type="submit" 
                 onClick={()=>{
 
+                    //多重送信防止
+                    if(isSubmit) return;
+                    setIsSubmit(true)
+                    
+                    //バリデーション
                     const errors = handleValidateInput(title,description);
-
                     if(Object.keys(errors).length > 0){
                         setInputError(errors);
+                        setIsSubmit(false);
                         return;
                     }
                     setInputError({}); 
+
+                    //送信
                     handleCreateTask(title,description)
                 }}
 

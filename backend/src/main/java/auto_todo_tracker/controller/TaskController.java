@@ -73,7 +73,12 @@ public class TaskController {
 
             createTask(task);
         }
+    }
 
+    @DeleteMapping("/list/all")
+    public void allDeleteTask(){
+        System.out.println("all delete");
+        taskService.deleteTask();
     }
 
 

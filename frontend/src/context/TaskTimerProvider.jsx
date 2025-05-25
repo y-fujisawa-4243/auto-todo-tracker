@@ -59,12 +59,10 @@ export const TaskTimerProvider = ({children}) => {
         intervalRef.current = null;
         runTaskIdRef.current = null;
 
-        console.log("保存")
         setElapsed(elapsed)
-
     };
 
-    
+
     //フォーマット変換関数
     const format = (elapsed) => {
 
@@ -93,7 +91,7 @@ export const TaskTimerProvider = ({children}) => {
     return(
         <>
             <TaskTimerContext.Provider value={
-                {elapsed,setElapsed,startTimer,stopTimer,getTime,switchTaskTimer}
+                {elapsed,intervalRef,setElapsed,startTimer,stopTimer,getTime,switchTaskTimer}
             }>
             {children}
             </TaskTimerContext.Provider>

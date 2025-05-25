@@ -1,10 +1,12 @@
-import { Link ,useNavigate} from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import ROUTE_PATHS from "../../../router/routePath";
+import { useEffect } from "react";
 
 //css
 import cx from "classnames";
 import style from "./NotFoundPage.module.css"
 import baseStyle from "../../../style/Util.module.css"
+
 
 const NotFoundPage = () =>{
 

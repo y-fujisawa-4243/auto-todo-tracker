@@ -1,6 +1,5 @@
 //ライブラリ
-import { useEffect, useState ,useContext} from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo } from 'react';
 import { useModalControl } from '../../../context/ModalControlProvider';
 
 //コンポーネント
@@ -24,43 +23,45 @@ import { getCreatedAt } from '../../../time/HandleTimerFuncs';
 import { useTaskTimer } from '../../../context/TaskTimerProvider';
 import TaskOver from '../../organism/task-over/TaskOver';
 
-
-
 const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
 
     const {isOpen,modalType,openModal,closeModal} = useModalControl(); 
-    const {stopTimer,elapsed} = useTaskTimer();
+    const {elapsed,intervalRef} = useTaskTimer();
 
 
-    //タスクのグルーピング処理
-    const groupedTasks = {
-        "RUNNING":[],
-        "PAUSE":[],
-        "TODO":[],
-        "STOP":[]
-    }
+    //tasksの値が更新されたとき、グルーピング処理
+    const groupedTasks = useMemo( ()=>{
+        return{
+        "RUNNING":tasks.filter( task=>task.taskStatus==="RUNNING" ),
+        "PAUSE":tasks.filter( task=>task.taskStatus==="PAUSE" ),
+        "TODO":tasks.filter( task=>task.taskStatus==="TODO" ),
+        "STOP":tasks.filter( task=>task.taskStatus==="STOP" )
+        }   
+    },[tasks] )
 
-    tasks.forEach(task =>{
-        switch(task.taskStatus){
-            case "RUNNING":
-                groupedTasks["RUNNING"].push(task)
-                break;
-            case "PAUSE":
-                groupedTasks["PAUSE"].push(task)
-                break;
-            case "TODO":
-                groupedTasks["TODO"].push(task)
-                break;
-            case "STOP":
-                groupedTasks["STOP"].push(task)
-                break;
-        }
-        }
-    )
 
-    //立ち上げ時データ取得
+    //マウント時初期処理
     useEffect( ()=>{
 
+        const needRecoveryBySystem = localStorage.getItem("needRecoveryBySystem");
+        const needRecoveryByHome = localStorage.getItem("needRecoveryByHome");
+        const buRunTask = localStorage.getItem("runningTaskBackup");
+
+        //復旧処理
+        const recoveryRunTask = async () => {
+
+            const parsed = JSON.parse(buRunTask);
+
+            console.log("parsedデータ///"+parsed)
+            await handleUpdateTask(parsed.taskId,{elapsedTime:parsed.elapsedTime,taskStatus:"PAUSE"})
+            
+            localStorage.removeItem("runningTaskBackup");            
+            localStorage.removeItem("needRecoveryBySystem");
+            localStorage.removeItem("needRecoveryByHome");
+
+        }
+
+        //タスク取得処理
         const fetchTasks = async () => {
             try {
                 const response = await getTasks();
@@ -71,34 +72,27 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
 
         };
 
-        fetchTasks();
-        
-    },[])
+        //それぞれ非同期で処理
+        const initTaskList = async () => {
 
-    useEffect( ()=>{
-        const handleBeforeUnload =async (e) => {
-        
-            console.log("ブラウザを閉じようとしている！");
+            //進捗中タスクがないなら、復旧処理なし
+            if(buRunTask){
+                
+                //タブまたはブラウザ削除要因 || ホーム画面遷移要因 || 進捗中タスクがあるのにタイマー停止の時(シャットダウン時対応)
+                if(needRecoveryBySystem || needRecoveryByHome || !intervalRef.current) {
+                    await recoveryRunTask();
+                    await fetchTasks();
+                    return;
+                }
 
-            if(groupedTasks["RUNNING"].length === 0) return;
-            const runTask = groupedTasks["RUNNING"][0]
-
-            stopTimer(runTask)
-            runTask.elapsedTime = elapsed
-            
-            if (runTask) {
-                localStorage.setItem("runningTaskBackup", JSON.stringify(runTask));
             }
+            await fetchTasks();
+        }
 
-        };
+        initTaskList();
 
-        window.addEventListener("beforeunload", handleBeforeUnload);
-
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    },[groupedTasks])
-
+    },[])
+    
 
     //Create関数
     const handleCreateTask = async (taskTitle,taskDescription) =>{
@@ -172,18 +166,20 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
         }
         };
 
-    useEffect( ()=>{
-        const buRunTask = localStorage.getItem("runningTaskBackup");
-        console.log("buRunTask/////"+buRunTask)
-        if(buRunTask){
-            console.log("入った")
-            const parsed = JSON.parse(buRunTask);
-            handleUpdateTask(parsed.taskId,{elapsedTime:parsed.elapsedTime,taskStatus:"PAUSE"})
-            
-            localStorage.removeItem("runningTaskBackup");
-        }
 
-    },[])
+    //タスクの状態が変化するたびに進捗中タスクのバックアップを1秒周期で取得
+    useEffect( ()=>{
+
+        if(groupedTasks["RUNNING"].length === 0) return;
+        const runTask = groupedTasks["RUNNING"][0];     //RUNNINGは1つのみという仕様に基づいた処理
+        console.log(groupedTasks["RUNNING"][0])
+
+        runTask.elapsedTime = elapsed;
+        localStorage.setItem("runningTaskBackup",JSON.stringify(runTask));
+
+    } ,[groupedTasks,elapsed])
+
+
 
     return(
         <>
