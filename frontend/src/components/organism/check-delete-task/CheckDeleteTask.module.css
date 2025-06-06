@@ -17,15 +17,17 @@
 }
 
 .cancelBtn{
-    background-color: rgb(236, 74, 33);
-    color: white;
-    width: 6rem;
+    background-color: rgb(255, 255, 255);
+    color:black;
+    width: 100px;
+    border:solid 2px rgb(201, 201, 201);
 }
 
 .createBtn{
-    background-color: rgb(8, 144, 255);
+    background-color: rgb(252, 71, 71);
     color: white;
     width: 6rem;
     margin-left: 10px;
+    border: none;
 }
 

@@ -3,10 +3,11 @@ import Routing from "./router/Routing";
 import {useState,createContext} from "react";
 import  "./App.css";
 import axios from "axios";
-import { patchTask } from "./api/taskApi";
+import { patchTask ,checkAuth } from "./api/taskApi";
 
 import { ModalControlProvider } from "./context/ModalControlProvider";
 import { TaskTimerProvider }  from "./context/TaskTimerProvider";
+import { AuthenticationProvider } from "./context/AuthenticationProvider";
 
 
 
@@ -20,22 +21,40 @@ const generateTime = async () => {
 };
 
 const allDelete = async () => {
-  await axios.delete("http://localhost:8080/list/all")
+  await axios.delete("http://localhost:8080/tasksAll")
 };
+
+const userAllDelete = async() =>{
+  await axios.delete("http://localhost:8080/userAll")
+}
+
+const getUser = async() =>{
+  try {
+      await checkAuth();
+      console.log("認証中")
+  } catch (error) {
+        console.log("未認証")
+  }
+
+}
 
 
 function App() {
   
   return(
     <div className="container">
-
+        <AuthenticationProvider>
           <TaskTimerProvider>
               <ModalControlProvider>
                 <Routing/>
               </ ModalControlProvider>
           </TaskTimerProvider>
+        </AuthenticationProvider>
 
 
+                  <button onClick={()=>userAllDelete()}>ユーザー全削除</button>
+                        <button onClick={() => allDelete()}>全てを破壊する</button>
+                        <button onClick={() => getUser()}>情報取得</button>
     </div>
   )
 }
@@ -46,4 +65,5 @@ export default App;
         <button onClick={() => generateTestData()}>test</button>
         <button onClick={() => generateTime()}>359990</button>
         <button onClick={() => allDelete()}>全てを破壊する</button>
+
 */ 

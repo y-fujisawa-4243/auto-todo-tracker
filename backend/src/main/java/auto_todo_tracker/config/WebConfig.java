@@ -1,4 +1,4 @@
-package auto_todo_tracker;
+package auto_todo_tracker.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

@@ -18,8 +18,7 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
     
     return(
         <>
-            <div className={style.cardBox}>
-
+            <div  className={`${style.cardBox} ${task.taskStatus === "RUNNING" ? style.runningShadow : null}`}>
             <ul>
                 <li>
                 {isInCompletedTaskList ? (

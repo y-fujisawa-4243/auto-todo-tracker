@@ -1,38 +1,47 @@
 .container{
-    width: 48rem;
-    margin: 0px auto;
-
+    width: 100%;
+    height: 100vh;
+    background-color: rgb(20, 20, 20);
 }
 
+/*アプリ名+menyu*/
 .wrapper{
-    width: 80%;
-    margin: 0px auto 2rem;
+    width: 100%;
+    height: 100%;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
 }
 
 .wrapper h2{
-    font-size: 2rem;
+    font-size: 2.5rem;
+    margin-left: 10px;
+    color: white;
 }
 
-.wrapper nav{
-    font-size: 1.1rem;
-}
 
-.ui{
+/*メニューバー部*/
+.menu{
+    width: 100%;
+    height: 100%;
     list-style: none;
     display: flex;
+    flex-direction: column;
+    color: white;
+    font-size: 1.1rem;
+    padding:0;
+    cursor: pointer;
 }
 
-.link{
-    display: inline-block;
-    margin: 0px 1rem;
-    text-decoration: none;
-    color: rgb(100, 100, 100);
+.menu li{
+    width: 100%;
+    text-indent: 2rem;
 }
 
-.link:hover{
-    text-decoration: underline;
-    color: rgb(40, 40, 40);
+.menu li:hover{
+    background-color: rgb(100, 100, 100);
 }
+
+.signout{
+    margin-top:auto;
+}
+

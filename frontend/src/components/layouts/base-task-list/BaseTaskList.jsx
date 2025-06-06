@@ -11,6 +11,7 @@ import TaskCard from "../../organism/task-card/TaskCard";
 import TaskDetail from '../../organism/task-detail/TaskDetail';
 import CheckDeleteTask from '../../organism/check-delete-task/CheckDeleteTask';
 import CheckStartTask from '../../organism/check-start-task/CheckStartTask';
+import CheckSignout from '../../organism/check-signout/CheckSignout';
 
 //スタイル
 import cx from "classnames";
@@ -22,6 +23,7 @@ import { postTask,deleteTask, getTasks,patchTask} from "../../../api/taskApi";
 import { getCreatedAt } from '../../../time/HandleTimerFuncs';
 import { useTaskTimer } from '../../../context/TaskTimerProvider';
 import TaskOver from '../../organism/task-over/TaskOver';
+
 
 const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
 
@@ -46,6 +48,11 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
         const needRecoveryBySystem = localStorage.getItem("needRecoveryBySystem");
         const needRecoveryByHome = localStorage.getItem("needRecoveryByHome");
         const buRunTask = localStorage.getItem("runningTaskBackup");
+
+        console.log("needSystem///"+needRecoveryBySystem);
+        console.log("needHome///"+needRecoveryByHome);
+        console.log("buRunTask///"+buRunTask);
+
 
         //復旧処理
         const recoveryRunTask = async () => {
@@ -75,22 +82,26 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
         //それぞれ非同期で処理
         const initTaskList = async () => {
 
-            //進捗中タスクがないなら、復旧処理なし
-            if(buRunTask){
-                
+            console.log(groupedTasks);
+
+            //進捗中タスクがあるならば、復旧処理
+            if(buRunTask && buRunTask.length !==0){
                 //タブまたはブラウザ削除要因 || ホーム画面遷移要因 || 進捗中タスクがあるのにタイマー停止の時(シャットダウン時対応)
-                if(needRecoveryBySystem || needRecoveryByHome || !intervalRef.current) {
+                console.log("システム"+needRecoveryBySystem)
+                console.log("ホーム"+needRecoveryByHome)
+                console.log("その他"+!intervalRef.current)
+                //if(needRecoveryBySystem || needRecoveryByHome || !intervalRef.current) {
+                if(needRecoveryBySystem || needRecoveryByHome || !intervalRef.current ) {
                     await recoveryRunTask();
                     await fetchTasks();
                     return;
                 }
-
             }
             await fetchTasks();
         }
 
+        //発火位置
         initTaskList();
-
     },[])
     
 
@@ -128,7 +139,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
     }
 
 
-    //Update関数 (引数は)
+    //Update関数
     const handleUpdateTask = async (taskId, argsObj={}) => {
         const sendData = {};
         const MAX_ELAPSED_SEC = 359999;
@@ -169,13 +180,18 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
 
     //タスクの状態が変化するたびに進捗中タスクのバックアップを1秒周期で取得
     useEffect( ()=>{
+        console.log("---BU関数---")
+        if(groupedTasks["RUNNING"].length !== 0){
+            console.log("計測中！！！！")
+            const runTask = groupedTasks["RUNNING"][0];     //RUNNINGは1つのみという仕様に基づいた処理
+            console.log(groupedTasks["RUNNING"][0])
 
-        if(groupedTasks["RUNNING"].length === 0) return;
-        const runTask = groupedTasks["RUNNING"][0];     //RUNNINGは1つのみという仕様に基づいた処理
-        console.log(groupedTasks["RUNNING"][0])
-
-        runTask.elapsedTime = elapsed;
-        localStorage.setItem("runningTaskBackup",JSON.stringify(runTask));
+            runTask.elapsedTime = elapsed;
+            localStorage.setItem("runningTaskBackup",JSON.stringify(runTask));
+        }else{
+            console.log("リムーブ")
+            localStorage.removeItem("runningTaskBackup")
+        }
 
     } ,[groupedTasks,elapsed])
 
@@ -183,132 +199,157 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
 
     return(
         <>
-        <NavHeader />
-        <div>
-            <main className={style.container}>
-            {isInCompletedTaskList ? (
-                <>
+        <div className={style.layout}>
+            <div className={style.navBar}>
+                <NavHeader />
+            </div>
+            <main className={style.mainContainer}>
+                {isInCompletedTaskList ? (<h2>タスク一覧</h2>):(<h2>完了タスク一覧</h2>)}
                 <section className={style.btnBox}>
+                {isInCompletedTaskList ? (
                     <button 
                         onClick={() => openModal("CREATE")}
                         className={cx(baseStyle.baseBtn,style.uniqueBtn)}
                     >
                         新規タスク作成
                     </button>
+                ):null}
                 </section>
-                <section className={style.taskField}>
-                    <h3>進捗中</h3> 
-                    {groupedTasks["RUNNING"].length===0 ? (
-                        <p className={style.notTaskMessage}>該当タスクは存在しません</p>
-                    ) :
-                    groupedTasks["RUNNING"].map( (task)=>{
-                        return(
+                <div className={style.horizontalLine}></div>
+                <div className={style.taskList}>
+                {isInCompletedTaskList ? (
+                    <>
+                    <section className={style.taskField}>
+                        <h3>進捗中</h3> 
+                        {groupedTasks["RUNNING"].length===0 ? (
+                            <p className={style.notTaskMessage}>該当タスクは存在しません</p>
+                        ) :
+                        groupedTasks["RUNNING"].map( (task)=>{
+                            return(
                             <div className={style.cardContainer}>
-                            <TaskCard key={task.taskId} task={task} tasks={tasks} getOptions={getOptions} 
-                            handleUpdateTask={handleUpdateTask} 
-                            isInCompletedTaskList={isInCompletedTaskList}>
-                            </TaskCard>
-                        </div>
-                        )
-                    } )
-                    }                   
-                </section>
-                <section className={style.taskField}>
-                    <h3>中断</h3>
-                    {groupedTasks["PAUSE"].length===0 ? (
-                        <p className={style.notTaskMessage}>該当タスクは存在しません</p>
-                    ) :
-                    groupedTasks["PAUSE"].map( (task)=>{
-                        return(
-                            <div className={style.cardContainer}>
-                                <TaskCard key={task.taskId} task={task} tasks={tasks}  getOptions={getOptions}
-                            handleUpdateTask={handleUpdateTask} 
-                            isInCompletedTaskList={isInCompletedTaskList}></TaskCard>
+                                <TaskCard 
+                                    key={task.taskId} 
+                                    task={task} 
+                                    tasks={tasks} 
+                                    getOptions={getOptions} 
+                                    handleUpdateTask={handleUpdateTask} 
+                                    isInCompletedTaskList={isInCompletedTaskList}></TaskCard>
                             </div>
-                        )
-                    } )
-                    }
-                </section>
-                <section className={style.taskField}>
-                    <h3>未実施</h3>
-                    {groupedTasks["TODO"].length===0 ? (
-                        <p className={style.notTaskMessage}>該当タスクは存在しません</p>
-                    ) :
-                    groupedTasks["TODO"].map( (task)=>{
-                        return(
+                            )
+                        } )
+                        }                   
+                    </section>
+                    <section className={style.taskField}>
+                        <h3>中断</h3>
+                        {groupedTasks["PAUSE"].length===0 ? (
+                            <p className={style.notTaskMessage}>該当タスクは存在しません</p>
+                        ) :
+                        groupedTasks["PAUSE"].map( (task)=>{
+                            return(
                             <div className={style.cardContainer}>
-                            <TaskCard key={task.taskId} task={task} tasks={tasks}  getOptions={getOptions}
-                            handleUpdateTask={handleUpdateTask} 
-                            isInCompletedTaskList={isInCompletedTaskList}>
-                            </TaskCard>
-                        </div>
-                        )
-                    } )
-                    }
-                </section>
-                </>
-                ):(
-                <section className={cx(style.taskField,style.compTakField)}>
-                    <h3>完了</h3> 
-                    {groupedTasks["STOP"].length===0 ? (
-                        <p className={style.notTaskMessage}>該当タスクは存在しません</p>
-                    ) :
-                    groupedTasks["STOP"].map( (task)=>{
-                        return(
+                                <TaskCard 
+                                    key={task.taskId} 
+                                    task={task} tasks={tasks}  
+                                    getOptions={getOptions}
+                                    handleUpdateTask={handleUpdateTask} 
+                                    isInCompletedTaskList={isInCompletedTaskList}></TaskCard>
+                            </div>
+                            )
+                        } )
+                        }
+                    </section>
+                    <section className={style.taskField}>
+                        <h3>未実施</h3>
+                        {groupedTasks["TODO"].length===0 ? (
+                            <p className={style.notTaskMessage}>該当タスクは存在しません</p>
+                        ) :
+                        groupedTasks["TODO"].map( (task)=>{
+                            return(
                             <div className={style.cardContainer}>
-                            <TaskCard task={task} tasks={tasks} getOptions={getOptions}
-                            handleUpdateTask={handleUpdateTask} 
-                            isInCompletedTaskList={isInCompletedTaskList}></TaskCard>
-                        </div>
-                        )
-                    } )
-                    }                   
-                </section>
-                )
-            }     
-
-                {isOpen ? (
-                    modalType === "CREATE" ? (
-                    <ModalForm>
-                        <CreataeTaskForm handleCreateTask={handleCreateTask} />
-                    </ModalForm>
-                    ) :
-
-                    modalType === "EDIT" ? (
-                    <ModalForm>
-                        <EditTaskForm handleUpdateTask={handleUpdateTask}/>
-                    </ModalForm>
-                    ) :
-
-                    modalType === "DETAIL" ? (
-                    <ModalForm>
-                        <TaskDetail />
-                    </ModalForm>
-                    ) :
-
-                    modalType === "DELETE" ? (
-                    <ModalForm>
-                        <CheckDeleteTask handleDeleteTask={handleDeleteTask} />
-                    </ModalForm>
-                    ) :
-
-                    modalType === "START" ? (
-                    <ModalForm>
-                        <CheckStartTask tasks={tasks} handleUpdateTask={handleUpdateTask}/>
-                    </ModalForm>
-                    ) :
-
-                    modalType === "TASK_OVER" ? (
-                    <ModalForm>
-                        <TaskOver />
-                    </ModalForm>
-                    ) :
-
-                    null
+                                <TaskCard 
+                                    key={task.taskId} 
+                                    task={task} tasks={tasks}  
+                                    getOptions={getOptions}
+                                    handleUpdateTask={handleUpdateTask} 
+                                    isInCompletedTaskList={isInCompletedTaskList}></TaskCard>
+                            </div>
+                            )
+                        } )
+                        }
+                    </section>
+                    </>
+                    ):(
+                    <section className={cx(style.taskField,style.compTakField)}>
+                        <h3>完了</h3> 
+                        {groupedTasks["STOP"].length===0 ? (
+                            <p className={style.notTaskMessage}>該当タスクは存在しません</p>
+                        ) :
+                        groupedTasks["STOP"].map( (task)=>{
+                            return(
+                            <div className={style.cardContainer}>
+                                <TaskCard 
+                                task={task}
+                                tasks={tasks} 
+                                getOptions={getOptions}
+                                handleUpdateTask={handleUpdateTask} 
+                                isInCompletedTaskList={isInCompletedTaskList}></TaskCard>
+                            </div>
+                            )
+                        } )
+                        }                   
+                    </section>
                     )
-                :null
-                }
+                }    
+                </div> 
             </main>
+            {isOpen ? (
+                modalType === "CREATE" ? (
+                <ModalForm>
+                    <CreataeTaskForm handleCreateTask={handleCreateTask} />
+                </ModalForm>
+                ) :
+
+                modalType === "EDIT" ? (
+                <ModalForm>
+                    <EditTaskForm handleUpdateTask={handleUpdateTask}/>
+                </ModalForm>
+                ) :
+
+                modalType === "DETAIL" ? (
+                <ModalForm>
+                    <TaskDetail />
+                </ModalForm>
+                ) :
+
+                modalType === "DELETE" ? (
+                <ModalForm>
+                    <CheckDeleteTask handleDeleteTask={handleDeleteTask} />
+                </ModalForm>
+                ) :
+
+                modalType === "START" ? (
+                <ModalForm>
+                    <CheckStartTask tasks={tasks} handleUpdateTask={handleUpdateTask}/>
+                </ModalForm>
+                ) :
+
+                modalType === "TASK_OVER" ? (
+                <ModalForm>
+                    <TaskOver />
+                </ModalForm>
+                ) :
+
+                modalType === "SIGN_OUT" ? (
+                <ModalForm>
+                    <CheckSignout />
+                </ModalForm>
+                ) :
+
+                null
+                )
+            :null
+            }
+
         </div>
         </>
     )

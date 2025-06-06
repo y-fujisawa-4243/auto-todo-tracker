@@ -56,17 +56,20 @@
 .btnWrap{
     text-align: center;
     margin: 0px auto 2rem;
+    
 }
 .cancelBtn{
-    background-color: rgb(236, 74, 33);
-    color: white;
+    background-color: rgb(255, 255, 255);
+    color:black;
     width: 100px;
+    border:solid 2px rgb(201, 201, 201);
 }
 
 .createBtn{
-    background-color: rgb(8, 144, 255);
+    background-color: rgb(71, 170, 252);
     color: white;
     width: 100px;
     margin-left: 10px;
+    border: none;
+    font-weight: 700;
 }
-

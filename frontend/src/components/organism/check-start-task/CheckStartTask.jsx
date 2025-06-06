@@ -1,11 +1,12 @@
-import { useContext } from "react";
+//Context
 import { useModalControl } from "../../../context/ModalControlProvider";
+import { useTaskTimer } from "../../../context/TaskTimerProvider";
 
 //css
 import cx from "classnames";
 import style from "./CheckStartTask.module.css"
 import baseStyle from "../../../style/Util.module.css"
-import { useTaskTimer } from "../../../context/TaskTimerProvider";
+
 
 const CheckStartTask = ({tasks,handleUpdateTask}) =>{
 
@@ -20,20 +21,20 @@ const CheckStartTask = ({tasks,handleUpdateTask}) =>{
                     <button 
                     onClick={()=>closeModal()}
                     className={cx(baseStyle.baseBtn,style.cancelBtn)}    
-                    >いいえ</button>
+                    >キャンセル</button>
                     <button 
-                    onClick={ async () =>{
-                        const runTaskArray =  tasks.filter( (task) => task.taskStatus === "RUNNING")
-                        console.log(`${currentTask}//${runTaskArray[0]}`)
+                        onClick={ async () =>{
+                            const runTaskArray =  tasks.filter( (task) => task.taskStatus === "RUNNING")
+                            console.log(`${currentTask}//${runTaskArray[0]}`)
 
-                        switchTaskTimer(runTaskArray[0])
-                        await handleUpdateTask(runTaskArray[0].taskId,{taskStatus:"PAUSE",elapsedTime:elapsed})
+                            switchTaskTimer(runTaskArray[0])
+                            await handleUpdateTask(runTaskArray[0].taskId,{taskStatus:"PAUSE",elapsedTime:elapsed})
 
-                        startTimer(currentTask)
-                        await handleUpdateTask(currentTask.taskId,{taskStatus:"RUNNING"})
-                    } }
+                            startTimer(currentTask)
+                            await handleUpdateTask(currentTask.taskId,{taskStatus:"RUNNING"})
+                        } }
                     className={cx(baseStyle.baseBtn,style.createBtn)}                       
-                    >はい</button>
+                    >問題ない</button>
                 </div>
             </div>
         </>

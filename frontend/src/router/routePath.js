@@ -8,8 +8,8 @@
 
 const ROUTE_PATHS = {
     HOME: "/",
-    LIST: "/list",
-    COMPLETE:"/list/complete",
+    LIST: "/tasks",
+    COMPLETE:"/tasks/complete",
     NOT_FOUND:"*"
   };
 

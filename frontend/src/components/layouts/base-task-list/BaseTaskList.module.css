@@ -1,14 +1,25 @@
-.container{
-    width: 48rem;
-    
+.layout{
+    display: flex;
+}
+
+.navBar{
+    width: 15%;
+}
+
+.mainContainer{
+    width: 85%;
     margin: 3rem auto 0;
 }
 
+.mainContainer h2{
+    font-size:2rem; 
+    margin-left: 1.5rem;
+}
+
 .btnBox{
-    width: 80%;
-    margin: 0px auto 2rem;
-    display: flex;
-    justify-content: right;
+    width:95%;
+    margin: 0px auto 8px;
+    text-align: right;
 }
 
 .uniqueBtn{
@@ -17,29 +28,41 @@
     font-size: 1.0rem;
 }
 
-.taskField{
-    width: 80%;
-    height: auto;
-    padding: 1px 0px 5px 0px;
-    margin: 0px auto 2rem;
-    border-radius: 1rem;
+
+.horizontalLine{
+    width: 100%;
+    height: 1px;
+    background-color: rgb(175, 175, 175);
 }
 
-.taskField:last-of-type {
-    margin-bottom: 0;
+
+/*タスクフィールド*/
+.taskList{
+    display: flex;
+    flex-direction: row;
+}
+
+.taskField{
+    width: 30%;
+    height: auto;
+    padding: 1px 0px 5px 0px;
+    margin: 0px 1.5rem 1rem;
+    border-radius: 1rem;
 }
 
 .taskField h3{
     font-size: 1.4rem;
-    border-bottom: solid 2px grey;
+ 
 }
+
 
 .notTaskMessage{
     text-align: center;
+    font-size: 1rem;
 }
 
 .cardContainer{
-    margin: 1rem auto; 
+    margin: 0.8rem auto; 
     display: flex;
     justify-content: center;
 }

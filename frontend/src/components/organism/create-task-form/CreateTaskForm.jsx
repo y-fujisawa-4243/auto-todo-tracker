@@ -63,7 +63,7 @@ const CreataeTaskForm = ({handleCreateTask}) =>{
                 )}
             </div>
         </div>
-         <div className={style.btnWrap}>
+        <div className={style.btnWrap}>
             <button 
                 onClick={() => closeModal()}
                 className={cx(baseStyle.baseBtn,style.cancelBtn)}

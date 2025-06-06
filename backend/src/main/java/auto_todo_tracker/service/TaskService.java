@@ -7,15 +7,16 @@ import auto_todo_tracker.exception.TaskLimitException;
 import auto_todo_tracker.model.dto.PatchTaskDTO;
 import auto_todo_tracker.model.dto.PostTaskDTO;
 import auto_todo_tracker.model.dto.TaskDTO;
-import auto_todo_tracker.model.entity.SessionEntity;
-import auto_todo_tracker.model.entity.TaskEntity;
-import auto_todo_tracker.model.entity.TaskStatus;
-import auto_todo_tracker.model.entity.TaskWithSession;
+import auto_todo_tracker.model.entity.*;
 import auto_todo_tracker.repository.SessionRepository;
 import auto_todo_tracker.repository.TaskRepository;
 
+import auto_todo_tracker.repository.UsersRepository;
+import auto_todo_tracker.util.SecurityUtil;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,49 +27,56 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final SessionRepository sessionRepository;
+    private final UsersRepository usersRepository;
+
 
     //コンストラクタ
-    public TaskService(TaskRepository taskRepository,SessionRepository sessionRepository){
+    public TaskService(TaskRepository taskRepository, SessionRepository sessionRepository, UsersRepository usersRepository){
         this.taskRepository = taskRepository;
         this.sessionRepository = sessionRepository;
+        this.usersRepository = usersRepository;
     }
 
 
     //タスク全取得処理
     public List<TaskDTO> getAllTaskDTOs(){
 
-        //各EntityListを取得する
-        List<TaskEntity> taskList = taskRepository.findAll();
-        List<SessionEntity> sessionList = sessionRepository.findAll();
+        //該当ユーザー取得
+        SecurityUtil secUtil = new SecurityUtil(usersRepository);
+        Long usersId = secUtil.getCurrentUser().getUsersId();
 
-        //sessionIDと内容を紐づけたmapの作成
-        Map<Long,TaskEntity> taskMap = new HashMap<>();
-        for(TaskEntity task : taskList){
-            System.out.println(task.getTaskStatus());
-            taskMap.put(task.getTaskId(),task);
-        }
+        //TaskEntity取得
+        List<TaskEntity> taskWithSessionList = taskRepository.findByUsers_UsersIdWithSession(usersId);
 
         //Entity ⇒　DTOへ変換し返す
-        return sessionList.stream()
-                .map(session -> TaskDTO.toDTO(taskMap.get(session.getTask().getTaskId()),session))
+        return taskWithSessionList.stream()
+                .map( task-> TaskDTO.toDTO(task,task.getSession()))
                 .toList();
+
     }
 
 
     //新規タスクの追加
     public TaskDTO createTaskDTO(PostTaskDTO postTaskDTO){
 
-        long count = taskRepository.count();;
-        if(count >= 50){
-            throw new TaskLimitException("タスク数が上限に達しています。");
-        }
+        //該当ユーザー取得
+        SecurityUtil secUtil = new SecurityUtil(usersRepository);
+        Long usersId = secUtil.getCurrentUser().getUsersId();
+        UsersEntity usersEntity = usersRepository.findByUsersId(usersId);
 
         //DTO ⇒ Entityに変換し保存
         TaskEntity taskEntity = postTaskDTO.toTaskEntity();
         SessionEntity sessionEntity = postTaskDTO.toSessionEntity();
 
+        //タスク数検証
+        long count = taskRepository.countByUsers_UsersId(usersId);
+        if(count >= 50){
+            throw new TaskLimitException("タスク数が上限に達しています。");
+        }
+
         //リレーション
         taskEntity.setSession(sessionEntity);
+        taskEntity.setUsers(usersEntity);
         sessionEntity.setTask(taskEntity);
 
         //保存
@@ -83,40 +91,53 @@ public class TaskService {
 
     
     //指定タスクの削除
-    public void deleteTaskById(Long taskId) {
+    public void deleteTaskById(Long taskId) throws AccessDeniedException {
+
+        //該当ユーザー取得
+        SecurityUtil secUtil = new SecurityUtil(usersRepository);
+        long usersId = secUtil.getCurrentUser().getUsersId();
 
         //指定したIDに一致するタスクがあるか
-        TaskEntity task = taskRepository.findById(taskId)
+        TaskEntity taskEntity = taskRepository.findById(taskId)
                         .orElseThrow(() -> new ResourceNotFoundException("指定されたタスクが見つかりません"));
+
+        //一致したタスクがそのユーザーのものか確認
+        if (!(taskEntity.getUsers().getUsersId() == usersId)){
+            throw new AccessDeniedException("タスク削除の権限がありません");
+        }
 
         taskRepository.deleteById(taskId);
 
-//        //タスクに作業時間などの記録があるか
-//        SessionEntity session = sessionRepository.findById(task.getTaskId())
-//                        .orElseThrow(() -> new EntityNotFoundException("セッションが見つかりません"));
-//
-//        sessionRepository.deleteById(session.getSessionId());
     }
 
 
     //指定タスクの更新
-    public TaskDTO patchTaskById(Long taskId,PatchTaskDTO patchTaskDTO) {
+    public TaskDTO patchTaskById(Long taskId,PatchTaskDTO patchTaskDTO) throws AccessDeniedException {
+
+        //該当ユーザー取得
+        SecurityUtil secUtil = new SecurityUtil(usersRepository);
+        long usersId = secUtil.getCurrentUser().getUsersId();
+
+        //指定したIDに一致するタスクがあるか
+        TaskEntity taskEntity = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("指定されたタスクが見つかりません"));
+
+        //一致したタスクがそのユーザーのものか確認
+        if (!(taskEntity.getUsers().getUsersId() == usersId)){
+            throw new AccessDeniedException("タスク編集の権限がありません");
+        }
 
         //バリデーション実施し、更新データを各Entityにまとめる。
-        TaskWithSession tws = validDataPatchRequest(taskId, patchTaskDTO);
+        TaskWithSession tws = validDataPatchRequest(taskEntity, patchTaskDTO);
         return TaskDTO.toDTO(tws.getTaskEntity(),tws.getSessionEntity());
 
     }
 
 
     //PATCHリクエストに対するバリデーション処理
-    public TaskWithSession validDataPatchRequest(Long taskId,PatchTaskDTO patchTaskDTO){
+    public TaskWithSession validDataPatchRequest(TaskEntity taskEntity,PatchTaskDTO patchTaskDTO){
 
-        final long MAX_ELAPSED_SEC = 359_999L;
-
-        //指定したIDに一致するタスクがあるか
-        TaskEntity taskEntity = taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("指定されたタスクが見つかりません"));
+        final long MAX_ELAPSED_SEC = 359_999L;  //計測最大値定数
 
         SessionEntity sessionEntity = taskEntity.getSession();
 
@@ -143,7 +164,7 @@ public class TaskService {
         //taskStatusがRUNNING かつ 他にもRUNNINGのタスクが存在する場合はエラー
         if (patchTaskDTO.taskStatus() != null){
             if(patchTaskDTO.taskStatus() == TaskStatus.RUNNING &&
-                    taskRepository.existsByTaskStatusAndTaskIdNot(TaskStatus.RUNNING,taskId)){
+                    taskRepository.existsByTaskStatusAndTaskIdNot(TaskStatus.RUNNING, taskEntity.getTaskId())){
                 throw  new ConflictException("作業中タスクがほかに存在します");
             }
             taskEntity.setTaskStatus(patchTaskDTO.taskStatus());

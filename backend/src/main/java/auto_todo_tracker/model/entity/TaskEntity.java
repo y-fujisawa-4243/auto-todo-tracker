@@ -4,6 +4,7 @@ import auto_todo_tracker.model.dto.TaskDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.catalina.User;
 
 @Entity
 @Getter
@@ -24,6 +25,11 @@ public class TaskEntity{
     @Column(length = 10, nullable = false)
     private TaskStatus taskStatus = TaskStatus.TODO;
 
+    @ManyToOne
+    @JoinColumn(name = "usersId",nullable = false)
+    private UsersEntity users;
+
+    //1つのTaskEntityに対して1つのSessionEntityの存在を定義。
     @OneToOne(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private SessionEntity session;
 }
