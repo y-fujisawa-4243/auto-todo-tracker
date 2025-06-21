@@ -5,6 +5,7 @@ import { useModalControl } from "../../../context/ModalControlProvider";
 import cx from "classnames";
 import style from "./CreateTaskForm.module.css"
 import baseStyle from "../../../style/Util.module.css"
+import { validateInput } from "../../../util/taskUtil";
 
 const CreataeTaskForm = ({handleCreateTask}) =>{
 
@@ -20,22 +21,25 @@ const CreataeTaskForm = ({handleCreateTask}) =>{
 
     const [isSubmit,setIsSubmit] = useState(false);
 
-    const handleValidateInput = (title,description) => {
-        const errors = {};
-
-        if ((title ?? "").trim() ==="") {
-            errors.taskTitle = "※タイトルは必須です";
-        } else if (title.length > 20) {
-            errors.taskTitle = "※タイトルは20文字以内で入力してください";
+    //作成処理関数
+    const criateFunction = () => {
+        
+        //多重送信防止
+        if(isSubmit) return;
+        setIsSubmit(true)
+        
+        //バリデーション
+        const errors = validateInput(title,description);
+        if(Object.keys(errors).length > 0){
+            setInputError(errors);
+            setIsSubmit(false);
+            return;
         }
+        setInputError({}); 
 
-        if (description.length > 256) {
-            errors.taskDescription = "※説明は256文字以内で入力してください";
-        }
-
-        return errors;
-  };
-
+        //送信
+        handleCreateTask(title,description)
+    }
 
     return(
         <div className={style.container}>
@@ -71,31 +75,14 @@ const CreataeTaskForm = ({handleCreateTask}) =>{
             </button>
             <button 
                 type="submit" 
-                onClick={()=>{
-
-                    //多重送信防止
-                    if(isSubmit) return;
-                    setIsSubmit(true)
-                    
-                    //バリデーション
-                    const errors = handleValidateInput(title,description);
-                    if(Object.keys(errors).length > 0){
-                        setInputError(errors);
-                        setIsSubmit(false);
-                        return;
-                    }
-                    setInputError({}); 
-
-                    //送信
-                    handleCreateTask(title,description)
-                }}
+                onClick={()=>criateFunction()}
 
                 
                 className={cx(baseStyle.baseBtn,style.createBtn)}
                 >作成
             </button>
         </div>
-      </div>
+    </div>
     )
 }
 

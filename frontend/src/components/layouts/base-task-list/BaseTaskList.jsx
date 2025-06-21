@@ -4,14 +4,7 @@ import { useModalControl } from '../../../context/ModalControlProvider';
 
 //コンポーネント
 import NavHeader from "../../header/NavHeader";
-import ModalForm from "../modal-wrapper/ModalForm";
-import CreataeTaskForm from '../../organism/create-task-form/CreateTaskForm';
-import EditTaskForm from "../../organism/edit-task-form/EditTaskForm";
 import TaskCard from "../../organism/task-card/TaskCard";
-import TaskDetail from '../../organism/task-detail/TaskDetail';
-import CheckDeleteTask from '../../organism/check-delete-task/CheckDeleteTask';
-import CheckStartTask from '../../organism/check-start-task/CheckStartTask';
-import CheckSignout from '../../organism/check-signout/CheckSignout';
 
 //スタイル
 import cx from "classnames";
@@ -20,79 +13,73 @@ import baseStyle from "../../../style/Util.module.css"
 
 //自作関数
 import { postTask,deleteTask, getTasks,patchTask} from "../../../api/taskApi";
-import { getCreatedAt } from '../../../time/HandleTimerFuncs';
 import { useTaskTimer } from '../../../context/TaskTimerProvider';
-import TaskOver from '../../organism/task-over/TaskOver';
+import { MODAL_TYPE, STORAGE_NAMES, TAKS_STATUS } from '../../../constants/appConstants';
 
+const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpdateTask}) => {
 
-const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
-
-    const {isOpen,modalType,openModal,closeModal} = useModalControl(); 
+    const {openModal} = useModalControl(); 
     const {elapsed,intervalRef} = useTaskTimer();
-
 
     //tasksの値が更新されたとき、グルーピング処理
     const groupedTasks = useMemo( ()=>{
         return{
-        "RUNNING":tasks.filter( task=>task.taskStatus==="RUNNING" ),
-        "PAUSE":tasks.filter( task=>task.taskStatus==="PAUSE" ),
-        "TODO":tasks.filter( task=>task.taskStatus==="TODO" ),
-        "STOP":tasks.filter( task=>task.taskStatus==="STOP" )
+        "RUNNING":tasks.filter( task=>task.taskStatus===TAKS_STATUS.RUNNING ),
+        "PAUSE":tasks.filter( task=>task.taskStatus===TAKS_STATUS.PAUSE  ),
+        "TODO":tasks.filter( task=>task.taskStatus===TAKS_STATUS.TODO  ),
+        "STOP":tasks.filter( task=>task.taskStatus===TAKS_STATUS.STOP  )
         }   
     },[tasks] )
+
+
+    //描画用のオブジェクト
+    const taskOptions = [
+        {status:TAKS_STATUS.RUNNING,label:"進捗中"},
+        {status:TAKS_STATUS.PAUSE,label:"中断"},
+        {status:TAKS_STATUS.TODO,label:"作業中"}
+    ]
+
+
+    //復旧処理
+    const recoveryRunTask = async (buRunTask) => {
+
+        const parsed = JSON.parse(buRunTask);
+        await handleUpdateTask(parsed.taskId,{elapsedTime:parsed.elapsedTime,taskStatus:"PAUSE"})
+        
+        localStorage.removeItem(STORAGE_NAMES.RUNNING_TASK_BACKUP);            
+        localStorage.removeItem(STORAGE_NAMES.NEED_RECOVERY_BY_SYSTEM);
+        localStorage.removeItem(STORAGE_NAMES.NEED_RECOVERY_BY_HOME);
+
+    }
+
+
+    //タスク取得処理
+    const fetchTasks = async () => {
+        try {
+            const response = await getTasks();
+            setTasks(response.data);
+        } catch (error) {
+            console.log(error)
+        }
+    };
 
 
     //マウント時初期処理
     useEffect( ()=>{
 
-        const needRecoveryBySystem = localStorage.getItem("needRecoveryBySystem");
-        const needRecoveryByHome = localStorage.getItem("needRecoveryByHome");
-        const buRunTask = localStorage.getItem("runningTaskBackup");
-
-        console.log("needSystem///"+needRecoveryBySystem);
-        console.log("needHome///"+needRecoveryByHome);
-        console.log("buRunTask///"+buRunTask);
-
-
-        //復旧処理
-        const recoveryRunTask = async () => {
-
-            const parsed = JSON.parse(buRunTask);
-
-            console.log("parsedデータ///"+parsed)
-            await handleUpdateTask(parsed.taskId,{elapsedTime:parsed.elapsedTime,taskStatus:"PAUSE"})
-            
-            localStorage.removeItem("runningTaskBackup");            
-            localStorage.removeItem("needRecoveryBySystem");
-            localStorage.removeItem("needRecoveryByHome");
-
-        }
-
-        //タスク取得処理
-        const fetchTasks = async () => {
-            try {
-                const response = await getTasks();
-                setTasks(response.data);
-            } catch (error) {
-                console.log(error)
-            }
-
-        };
+        //localStrageデータ取得
+        const buRunTask = localStorage.getItem(STORAGE_NAMES.RUNNING_TASK_BACKUP);
+        const needRecoveryBySystem = localStorage.getItem(STORAGE_NAMES.NEED_RECOVERY_BY_SYSTEM);
+        const needRecoveryByHome = localStorage.getItem(STORAGE_NAMES.NEED_RECOVERY_BY_HOME);
 
         //それぞれ非同期で処理
         const initTaskList = async () => {
 
-            console.log(groupedTasks);
-
             //進捗中タスクがあるならば、復旧処理
             if(buRunTask && buRunTask.length !==0){
-                //タブまたはブラウザ削除要因 || ホーム画面遷移要因 || 進捗中タスクがあるのにタイマー停止の時(シャットダウン時対応)
-                console.log("システム"+needRecoveryBySystem)
-                console.log("ホーム"+needRecoveryByHome)
-                console.log("その他"+!intervalRef.current)
-                //if(needRecoveryBySystem || needRecoveryByHome || !intervalRef.current) {
+                //タブまたはブラウザ削除要因 || ホーム画面遷移要因 || 進捗中タスクが存在するのに計測が停止している場合(intervalIDがfalse)
                 if(needRecoveryBySystem || needRecoveryByHome || !intervalRef.current ) {
-                    await recoveryRunTask();
+                    await recoveryRunTask(buRunTask);
                     await fetchTasks();
                     return;
                 }
@@ -102,100 +89,10 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
 
         //発火位置
         initTaskList();
+
+        return undefined;
     },[])
     
-
-    //Create関数
-    const handleCreateTask = async (taskTitle,taskDescription) =>{
-
-        if(Object.keys(tasks).length >= 50){
-            closeModal();
-            openModal("TASK_OVER");
-            return;
-        } 
-
-        const startedAt = getCreatedAt();
-        console.log(startedAt)
-
-        try {
-            const response = await postTask(taskTitle,taskDescription,startedAt)
-            setTasks((prevTasks) =>[...prevTasks,response.data])
-            closeModal();
-        } catch (error) {
-            console.log(error);
-        }
-
-    }
-
-
-    //Delete関数
-    const handleDeleteTask = async (taskId) =>{
-        await deleteTask(taskId)
-
-        setTasks( (prevTasks)=>prevTasks.filter( (task) =>{
-            return task.taskId !== taskId
-        } ))
-        closeModal();
-    }
-
-
-    //Update関数
-    const handleUpdateTask = async (taskId, argsObj={}) => {
-        const sendData = {};
-        const MAX_ELAPSED_SEC = 359999;
-
-        //引数解析
-        if (argsObj.taskTitle ) sendData.taskTitle = argsObj.taskTitle;
-        if (argsObj.taskDescription ) sendData.taskDescription = argsObj.taskDescription;
-        if (argsObj.elapsedTime){
-            if(argsObj.elapsedTime  > MAX_ELAPSED_SEC) {
-                sendData.elapsedTime = MAX_ELAPSED_SEC
-            }else{
-                sendData.elapsedTime = argsObj.elapsedTime
-            }
-        } 
-        if (argsObj.taskStatus) sendData.taskStatus = argsObj.taskStatus;
-        
-        if (Object.keys(sendData).length === 0) {       //入力がされていないとき     
-            return;
-        }
-
-        console.log(`タスクステータス${sendData.taskStatus}`);
-        
-        //送信処理
-        try {
-            const response = await patchTask(taskId, sendData);
-            console.log(`タスクdata${response.data}`);
-            setTasks((prevTasks) => prevTasks.map( (task)=>{
-                if(task.taskId !== taskId) return task;
-                return {...task,...response.data};
-            } ) )
-            closeModal();
-
-        } catch (error) {
-            console.error(error);
-        }
-        };
-
-
-    //タスクの状態が変化するたびに進捗中タスクのバックアップを1秒周期で取得
-    useEffect( ()=>{
-        console.log("---BU関数---")
-        if(groupedTasks["RUNNING"].length !== 0){
-            console.log("計測中！！！！")
-            const runTask = groupedTasks["RUNNING"][0];     //RUNNINGは1つのみという仕様に基づいた処理
-            console.log(groupedTasks["RUNNING"][0])
-
-            runTask.elapsedTime = elapsed;
-            localStorage.setItem("runningTaskBackup",JSON.stringify(runTask));
-        }else{
-            console.log("リムーブ")
-            localStorage.removeItem("runningTaskBackup")
-        }
-
-    } ,[groupedTasks,elapsed])
-
-
 
     return(
         <>
@@ -208,7 +105,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
                 <section className={style.btnBox}>
                 {isInCompletedTaskList ? (
                     <button 
-                        onClick={() => openModal("CREATE")}
+                        onClick={() => openModal(MODAL_TYPE.CREATE)}
                         className={cx(baseStyle.baseBtn,style.uniqueBtn)}
                     >
                         新規タスク作成
@@ -219,80 +116,50 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
                 <div className={style.taskList}>
                 {isInCompletedTaskList ? (
                     <>
-                    <section className={style.taskField}>
-                        <h3>進捗中</h3> 
-                        {groupedTasks["RUNNING"].length===0 ? (
-                            <p className={style.notTaskMessage}>該当タスクは存在しません</p>
-                        ) :
-                        groupedTasks["RUNNING"].map( (task)=>{
-                            return(
-                            <div className={style.cardContainer}>
-                                <TaskCard 
-                                    key={task.taskId} 
-                                    task={task} 
-                                    tasks={tasks} 
-                                    getOptions={getOptions} 
-                                    handleUpdateTask={handleUpdateTask} 
-                                    isInCompletedTaskList={isInCompletedTaskList}></TaskCard>
-                            </div>
-                            )
-                        } )
-                        }                   
-                    </section>
-                    <section className={style.taskField}>
-                        <h3>中断</h3>
-                        {groupedTasks["PAUSE"].length===0 ? (
-                            <p className={style.notTaskMessage}>該当タスクは存在しません</p>
-                        ) :
-                        groupedTasks["PAUSE"].map( (task)=>{
-                            return(
-                            <div className={style.cardContainer}>
-                                <TaskCard 
-                                    key={task.taskId} 
-                                    task={task} tasks={tasks}  
-                                    getOptions={getOptions}
-                                    handleUpdateTask={handleUpdateTask} 
-                                    isInCompletedTaskList={isInCompletedTaskList}></TaskCard>
-                            </div>
-                            )
-                        } )
-                        }
-                    </section>
-                    <section className={style.taskField}>
-                        <h3>未実施</h3>
-                        {groupedTasks["TODO"].length===0 ? (
-                            <p className={style.notTaskMessage}>該当タスクは存在しません</p>
-                        ) :
-                        groupedTasks["TODO"].map( (task)=>{
-                            return(
-                            <div className={style.cardContainer}>
-                                <TaskCard 
-                                    key={task.taskId} 
-                                    task={task} tasks={tasks}  
-                                    getOptions={getOptions}
-                                    handleUpdateTask={handleUpdateTask} 
-                                    isInCompletedTaskList={isInCompletedTaskList}></TaskCard>
-                            </div>
-                            )
-                        } )
-                        }
-                    </section>
+                    {taskOptions.map( (option)=>{
+                        return(
+                            <section key={option.key} className={style.taskField}>
+                                <h3>{option.label}</h3> 
+                                {groupedTasks[option.status].length===0 ? (
+                                    <p className={style.notTaskMessage}>該当タスクは存在しません</p>
+                                ) :
+                                groupedTasks[option.status].map( (task)=>{
+                                    return(
+                                        <div key={task.key} className={style.cardContainer}>
+                                            <TaskCard 
+                                                key={task.taskId} 
+                                                task={task} 
+                                                tasks={tasks} 
+                                                getOptions={getOptions} 
+                                                handleUpdateTask={handleUpdateTask} 
+                                                isInCompletedTaskList={isInCompletedTaskList}
+                                                >
+                                            </TaskCard>
+                                        </div>
+                                    )
+                                } )
+                                }                   
+                            </section>
+                        )
+                    } )}
                     </>
                     ):(
                     <section className={cx(style.taskField,style.compTakField)}>
                         <h3>完了</h3> 
-                        {groupedTasks["STOP"].length===0 ? (
+                        {groupedTasks[TAKS_STATUS.STOP].length===0 ? (
                             <p className={style.notTaskMessage}>該当タスクは存在しません</p>
                         ) :
-                        groupedTasks["STOP"].map( (task)=>{
+                        groupedTasks[TAKS_STATUS.STOP].map( (task)=>{
                             return(
-                            <div className={style.cardContainer}>
+                            <div key={task.key} className={style.cardContainer}>
                                 <TaskCard 
-                                task={task}
-                                tasks={tasks} 
-                                getOptions={getOptions}
-                                handleUpdateTask={handleUpdateTask} 
-                                isInCompletedTaskList={isInCompletedTaskList}></TaskCard>
+                                    task={task}
+                                    tasks={tasks} 
+                                    getOptions={getOptions}
+                                    handleUpdateTask={handleUpdateTask} 
+                                    isInCompletedTaskList={isInCompletedTaskList}
+                                    >
+                                </TaskCard>
                             </div>
                             )
                         } )
@@ -302,53 +169,6 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions}) => {
                 }    
                 </div> 
             </main>
-            {isOpen ? (
-                modalType === "CREATE" ? (
-                <ModalForm>
-                    <CreataeTaskForm handleCreateTask={handleCreateTask} />
-                </ModalForm>
-                ) :
-
-                modalType === "EDIT" ? (
-                <ModalForm>
-                    <EditTaskForm handleUpdateTask={handleUpdateTask}/>
-                </ModalForm>
-                ) :
-
-                modalType === "DETAIL" ? (
-                <ModalForm>
-                    <TaskDetail />
-                </ModalForm>
-                ) :
-
-                modalType === "DELETE" ? (
-                <ModalForm>
-                    <CheckDeleteTask handleDeleteTask={handleDeleteTask} />
-                </ModalForm>
-                ) :
-
-                modalType === "START" ? (
-                <ModalForm>
-                    <CheckStartTask tasks={tasks} handleUpdateTask={handleUpdateTask}/>
-                </ModalForm>
-                ) :
-
-                modalType === "TASK_OVER" ? (
-                <ModalForm>
-                    <TaskOver />
-                </ModalForm>
-                ) :
-
-                modalType === "SIGN_OUT" ? (
-                <ModalForm>
-                    <CheckSignout />
-                </ModalForm>
-                ) :
-
-                null
-                )
-            :null
-            }
 
         </div>
         </>
