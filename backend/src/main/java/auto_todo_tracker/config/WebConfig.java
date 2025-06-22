@@ -11,7 +11,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry){
         registry.addMapping("/**")
                 .allowedOrigins(
-                        "http://localhost:3000"     //開発用
+                        "http://localhost:3000", //開発用
+                        "https://auto-todo-tracker.vercel.app/" //公開用
                 )
                 .allowedMethods("*")
                 .allowedHeaders("*")
