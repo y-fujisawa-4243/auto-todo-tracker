@@ -1,3 +1,4 @@
+import { STORAGE_NAMES } from "../constants/appConstants";
 
 //タスク更新データを構築する関数
 export const buildUpdateData = (argsObj) =>{
@@ -23,7 +24,7 @@ export const buildUpdateData = (argsObj) =>{
 
 
 //タスク作成/更新時バリデーション
-export const validateInput = (title,description) => {
+export const validateInput = (title,description) =>{
     const errors = {};
 
     if ((title ?? "").trim() ==="") {
@@ -38,3 +39,12 @@ export const validateInput = (title,description) => {
 
     return errors;
 };
+
+
+/*進捗中タスクのバックアップ削除処理
+※削除処理は複数コンポーネントで使用するため、関数化した。
+*/
+export const removeRunTaskBu = () =>{
+    localStorage.removeItem(STORAGE_NAMES.RUNNING_TASK_BACKUP);
+
+}

@@ -10,7 +10,7 @@ import cx from "classnames";
 import style from "./Home.module.css";
 import baseStyle from "../../../style/Util.module.css";
 
-import { MODAL_TYPE, ROUTE_PATHS, TAKS_STATUS } from "../../../constants/appConstants";
+import { MODAL_TYPE, ROUTE_PATHS, STORAGE_NAMES, TAKS_STATUS } from "../../../constants/appConstants";
 
 import { postSignIn ,postSignUp,postSignout} from "../../../api/taskApi";
 
@@ -53,28 +53,28 @@ const Home = ({tasks}) =>{
     },[isAuth])
 
 
-    //ホーム画面遷移検知
-    useEffect( ()=>{
+    // //ホーム画面遷移検知
+    // useEffect( ()=>{
 
-        const runTask = tasks.filter( task=>task.taskStatus===TAKS_STATUS.RUNNING);
-        console.log(runTask)
-                console.log(runTask.length)
+    //     const runTask = tasks.filter( task=>task.taskStatus===TAKS_STATUS.RUNNING);
+    //     console.log(runTask)
+    //             console.log(runTask.length)
 
-        if(runTask.length===0) return;
+    //     if(runTask.length===0) return;
         
-        stopTimer(runTask[0]);
+    //     stopTimer(runTask[0]);
 
-        //タブ削除、ブラウザ削除時
-        const handleBeforeUnload = () => {
-            localStorage.setItem("needRecoveryByHome", "true");
+    //     //タブ削除、ブラウザ削除時
+    //     const handleBeforeUnload = () => {
+    //         localStorage.setItem(STORAGE_NAMES.NEED_RECOVERY_BY_HOME, "true");
 
-        };
+    //     };
 
-        return () => {
-            handleBeforeUnload();
-        };
+    //     return () => {
+    //         handleBeforeUnload();
+    //     };
 
-    },[tasks])
+    // },[tasks])
 
 
     //バリデーション

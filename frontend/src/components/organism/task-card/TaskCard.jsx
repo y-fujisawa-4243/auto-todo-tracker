@@ -8,12 +8,48 @@ import PauseIcon from '@mui/icons-material/Pause';
 import { useModalControl } from "../../../context/ModalControlProvider";
 import {useTaskTimer} from "../../../context/TaskTimerProvider"
 import DoneIcon from '@mui/icons-material/Done';
-import { MODAL_TYPE, TAKS_STATUS } from "../../../constants/appConstants";
+import { MODAL_TYPE, STORAGE_NAMES, TAKS_STATUS } from "../../../constants/appConstants";
+import { removeRunTaskBu } from "../../../util/taskUtil";
 
 const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}) =>{
 
     const {openModal} = useModalControl(); 
     const {elapsed,getTime,startTimer,stopTimer} =useTaskTimer();
+
+    const runTask = tasks.find( (task)=>task.taskStatus === TAKS_STATUS.RUNNING )   //進捗中タスク
+
+
+    //完了or中断ボタンハンドラー
+    const handleStopOrPause = async(status) => {
+
+        //進捗中タスクが停止したとき
+        if (runTask && runTask.taskId === task.taskId){
+            removeRunTaskBu();
+            await stopTimer(task);
+            await handleUpdateTask(task.taskId, {elapsedTime:elapsed, taskStatus: status });
+            return;
+        }
+
+        //クリックしたタスクが進捗中タスクではないとき
+        await handleUpdateTask(task.taskId, { taskStatus: status });
+    }
+
+
+    //開始ボタンハンドラー
+    const handleStart = async() => {
+
+        //クリックしたタスクの他に進捗中タスクがある場合
+        if (runTask) {
+            openModal(MODAL_TYPE.WARN_RUN, task);
+            return;
+        }
+
+        //ほかの進捗中タスクが存在しない場合
+        startTimer(task);
+        await handleUpdateTask(task.taskId, { taskStatus: TAKS_STATUS.RUNNING });
+        
+    }
+
     
     return(
         <>
@@ -22,32 +58,16 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
                 <li>
                 {isInCompletedTaskList ? (
                     <button 
-                    title="完了"
-                    className={style.nomalDoneIcon}
-                    onClick={ async()=>{
-                        const runTask = tasks.find( (task)=>task.taskStatus === TAKS_STATUS.RUNNING )   //作業中タスクが存在するかの確認 
-                        
-                        //作業中のタスクが停止したとき
-                        if (runTask && runTask.taskId === task.taskId){
-                            stopTimer(task);
-                            await handleUpdateTask(task.taskId, {elapsedTime:elapsed, taskStatus: TAKS_STATUS.STOP });
-                            return;
-                        }
-
-                        //作業中タスクがなければ、このタスクを停止
-                        await handleUpdateTask(task.taskId, { taskStatus: TAKS_STATUS.STOP });
-                        }
-                    }>
+                        title="完了"
+                        className={style.nomalDoneIcon}
+                        onClick={()=>handleStopOrPause(TAKS_STATUS.STOP)}>
                     </button>
                 ):(   
                     <button 
-                    title="再開"
-                    className={style.checkDoneIcon}
-                    onClick={async ()=>{
-                        const runTask = tasks.find( (task)=>task.taskStatus === TAKS_STATUS.RUNNING )   //作業中タスクが存在するかの確認 
-
-                        //タスクを未実施へ復帰
-                        await handleUpdateTask(task.taskId, { taskStatus: TAKS_STATUS.TODO });
+                        title="再開"
+                        className={style.checkDoneIcon}
+                        onClick={async ()=>{
+                            await handleUpdateTask(task.taskId, { taskStatus: TAKS_STATUS.TODO });
                         }
                     }>
                     <DoneIcon/>
@@ -61,15 +81,7 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
                     <button
                         title="中断"
                         className={style.pauseIcon}
-                        onClick={ async () => {
-                        const runTask = tasks.find((task) => task.taskStatus === TAKS_STATUS.RUNNING);
-                        if (runTask && runTask.taskId === task.taskId) {
-                            stopTimer(task);
-                            await handleUpdateTask(task.taskId, { elapsedTime: elapsed, taskStatus: TAKS_STATUS.PAUSE });
-                            return;
-                        }
-                        await handleUpdateTask(task.taskId, { taskStatus: TAKS_STATUS.PAUSE });
-                        }}
+                        onClick={()=>handleStopOrPause(TAKS_STATUS.PAUSE)}
                     >
                         <PauseIcon />
                     </button>
@@ -77,24 +89,13 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
                     <button
                         title="開始"
                         className={style.startIcon}
-                        onClick={async () => {
-                        const runTask = tasks.find((task) => task.taskStatus === TAKS_STATUS.RUNNING);
-                        if (runTask && runTask.taskId === task.taskId) return;
-                        if (runTask) {
-                            openModal(MODAL_TYPE.WARN_RUN, task);
-                            return;
-                        }
-                        startTimer(task);
-                        await handleUpdateTask(task.taskId, { taskStatus: TAKS_STATUS.RUNNING });
-                        }}
+                        onClick={handleStart}
                     >
                         <PlayArrowIcon />
                     </button>
                     )
                 )}
                 </li>
-
-
             </ul>
             <p className={style.taskTitle}>{`${task.taskTitle}`}</p>
             <p className={style.time}>{getTime(task)}</p>

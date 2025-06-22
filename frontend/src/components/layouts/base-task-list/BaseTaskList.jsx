@@ -15,6 +15,7 @@ import baseStyle from "../../../style/Util.module.css"
 import { postTask,deleteTask, getTasks,patchTask} from "../../../api/taskApi";
 import { useTaskTimer } from '../../../context/TaskTimerProvider';
 import { MODAL_TYPE, STORAGE_NAMES, TAKS_STATUS } from '../../../constants/appConstants';
+import { removeRunTaskBu } from '../../../util/taskUtil';
 
 const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpdateTask}) => {
 
@@ -46,7 +47,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
         const parsed = JSON.parse(buRunTask);
         await handleUpdateTask(parsed.taskId,{elapsedTime:parsed.elapsedTime,taskStatus:"PAUSE"})
         
-        localStorage.removeItem(STORAGE_NAMES.RUNNING_TASK_BACKUP);            
+        removeRunTaskBu();       
         localStorage.removeItem(STORAGE_NAMES.NEED_RECOVERY_BY_SYSTEM);
         localStorage.removeItem(STORAGE_NAMES.NEED_RECOVERY_BY_HOME);
 
@@ -71,6 +72,10 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
         const buRunTask = localStorage.getItem(STORAGE_NAMES.RUNNING_TASK_BACKUP);
         const needRecoveryBySystem = localStorage.getItem(STORAGE_NAMES.NEED_RECOVERY_BY_SYSTEM);
         const needRecoveryByHome = localStorage.getItem(STORAGE_NAMES.NEED_RECOVERY_BY_HOME);
+
+        console.log("buRunTask///"+buRunTask)
+        console.log("needRecoveryBySystem///"+needRecoveryBySystem)
+        console.log("needRecoveryByHome///"+needRecoveryByHome)
 
         //それぞれ非同期で処理
         const initTaskList = async () => {

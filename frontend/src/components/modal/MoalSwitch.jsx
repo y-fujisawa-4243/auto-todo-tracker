@@ -61,7 +61,7 @@ const ModalSwitch = ({tasks,handleCreateTask,handleDeleteTask,handleUpdateTask})
 
                 modalType === MODAL_TYPE.SIGN_OUT ? (
                 <ModalForm>
-                    <CheckSignout />
+                    <CheckSignout tasks={tasks}/>
                 </ModalForm>
                 ) :
 

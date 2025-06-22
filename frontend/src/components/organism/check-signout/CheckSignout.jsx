@@ -10,27 +10,36 @@ import cx from "classnames";
 import style from "./CheckSignout.module.css"
 import baseStyle from "../../../style/Util.module.css"
 import { useNavigate } from "react-router-dom";
+import { ROUTE_PATHS, STORAGE_NAMES, TAKS_STATUS } from "../../../constants/appConstants";
 
 
-const CheckSignout = ({tasks,handleUpdateTask}) =>{
+const CheckSignout = ({tasks}) =>{
 
-    const {closeModal,currentTask} = useModalControl();  
-    const {elapsed,startTimer,switchTaskTimer} = useTaskTimer(); 
-    const {isAuth,setIsAuth} = useAuth();
+    const {closeModal} = useModalControl();  
+    const {stopTimer} = useTaskTimer(); 
+    const {setIsAuth} = useAuth();
 
     const navigate = useNavigate();
     
     //サインアウト処理
     const handleSignout = async() =>{
+
+        const runTask = (tasks??[]).filter( task=>task.taskStatus===TAKS_STATUS.RUNNING);
+        console.log(runTask)
+        if(runTask.length!==0) {
+            await stopTimer(runTask[0]);    //※進捗中タスクは1つまでという仕様前提の記述
+            localStorage.setItem(STORAGE_NAMES.NEED_RECOVERY_BY_HOME, "true");
+        }
+
         try {
             await postSignout();
-            console.log("できてる？")
             setIsAuth(false);
             closeModal();
-            navigate("/");
+            navigate(ROUTE_PATHS.HOME);
         } catch (error) {
             console.log(error);
         }
+        
     }
 
     return(
@@ -44,7 +53,7 @@ const CheckSignout = ({tasks,handleUpdateTask}) =>{
                         className={cx(baseStyle.baseBtn,style.cancelBtn)}    
                     >キャンセル</button>
                     <button 
-                        onClick={  () => handleSignout()} 
+                        onClick={()=>handleSignout()} 
                     className={cx(baseStyle.baseBtn,style.createBtn)}                       
                     >問題ない</button>
                 </div>
