@@ -38,6 +38,10 @@ const getUser = async() =>{
 
 }
 
+const clearStrage = () =>{
+  localStorage.clear();
+}
+
 
 function App() {
   
@@ -55,6 +59,7 @@ function App() {
                   <button onClick={()=>userAllDelete()}>ユーザー全削除</button>
                         <button onClick={() => allDelete()}>全てを破壊する</button>
                         <button onClick={() => getUser()}>情報取得</button>
+                  <button onClick={()=>clearStrage()}>ストレージ削除</button>
     </div>
   )
 }

@@ -1,6 +1,5 @@
 import { useNavigate} from "react-router-dom";
-import ROUTE_PATHS from "../../../router/routePath";
-import { useEffect } from "react";
+import { ROUTE_PATHS } from "../../../constants/appConstants";
 
 //css
 import cx from "classnames";

@@ -1,6 +1,6 @@
 
 import { useNavigate} from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useTaskTimer } from "../../../context/TaskTimerProvider";
 import { useModalControl } from "../../../context/ModalControlProvider";
@@ -10,7 +10,7 @@ import cx from "classnames";
 import style from "./Home.module.css";
 import baseStyle from "../../../style/Util.module.css";
 
-import ROUTE_PATHS from "../../../router/routePath";
+import { MODAL_TYPE, ROUTE_PATHS, STORAGE_NAMES, TAKS_STATUS } from "../../../constants/appConstants";
 
 import { postSignIn ,postSignUp,postSignout} from "../../../api/taskApi";
 
@@ -53,36 +53,28 @@ const Home = ({tasks}) =>{
     },[isAuth])
 
 
-    //tasksの値が更新されたとき、グルーピング処理
-    const groupedTasks = useMemo( ()=>{
-        return{
-        "RUNNING":tasks.filter( task=>task.taskStatus==="RUNNING" ),
-        "PAUSE":tasks.filter( task=>task.taskStatus==="PAUSE" ),
-        "TODO":tasks.filter( task=>task.taskStatus==="TODO" ),
-        "STOP":tasks.filter( task=>task.taskStatus==="STOP" )
-        }   
-    },[tasks] )
+    // //ホーム画面遷移検知
+    // useEffect( ()=>{
 
+    //     const runTask = tasks.filter( task=>task.taskStatus===TAKS_STATUS.RUNNING);
+    //     console.log(runTask)
+    //             console.log(runTask.length)
 
-    //ホーム画面遷移検知
-    useEffect( ()=>{
-
-        if(groupedTasks["RUNNING"]?.length === 0) return;
-        const runTask = groupedTasks["RUNNING"][0];   
+    //     if(runTask.length===0) return;
         
-        stopTimer(runTask);
+    //     stopTimer(runTask[0]);
 
-        //タブ削除、ブラウザ削除時
-        const handleBeforeUnload = () => {
-            localStorage.setItem("needRecoveryByHome", "true");
+    //     //タブ削除、ブラウザ削除時
+    //     const handleBeforeUnload = () => {
+    //         localStorage.setItem(STORAGE_NAMES.NEED_RECOVERY_BY_HOME, "true");
 
-        };
+    //     };
 
-        return () => {
-            handleBeforeUnload();
-        };
+    //     return () => {
+    //         handleBeforeUnload();
+    //     };
 
-    },[tasks])
+    // },[tasks])
 
 
     //バリデーション
@@ -95,7 +87,7 @@ const Home = ({tasks}) =>{
             errors.userIdMsg = "※ユーザーIDは4文字以上~20文字以内で入力してください";
         }
 
- 
+
         if ((password ?? "").trim() ==="") {
             errors.passwordMsg = "※パスワードは必須入力です";       
         }else if (password.length<8 || password.length > 64) {
@@ -122,7 +114,7 @@ const Home = ({tasks}) =>{
         try {
             await postSignIn(userId,password);
             setIsAuth(true);
-            navigate("/tasks");
+            navigate(ROUTE_PATHS.LIST);
         } catch (error) {
             setSigninError({authMsg:error.response.data.errorMsg})
         }
@@ -179,7 +171,7 @@ const Home = ({tasks}) =>{
                 <p className={style.errorMsg}>{signinError.authMsg}</p>
                 )}
                 <p className={style.accountText}>まだアカウントをお持ちでない方は、以下から作成いただけます</p>
-                <button className={style.accountBtn} onClick={()=>openModal("ACCONTU")}>
+                <button className={style.accountBtn} onClick={()=>openModal(MODAL_TYPE.ACCOUNT)}>
                     新規登録
                 </button>
 
@@ -191,7 +183,8 @@ const Home = ({tasks}) =>{
                         handleValidateUser ={handleValidateUser}
                         signupError={signupError}
                         setSignupError={setSignupError}
-                        ></CreateUserAccount>
+                        >
+                    </CreateUserAccount>
                 </ModalForm>
             ):null}
         </>

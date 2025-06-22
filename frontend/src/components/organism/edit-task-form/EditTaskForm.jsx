@@ -1,5 +1,6 @@
 import { useState,useContext } from "react";
 import { useModalControl } from "../../../context/ModalControlProvider";
+import {validateInput} from "../../../util/taskUtil.js"
 
 //css
 import cx from "classnames";
@@ -20,22 +21,25 @@ const EditTaskForm = ({handleUpdateTask}) =>{
 
     const [isSubmit,setIsSubmit] = useState(false);
 
-    const handleValidateInput = (title,description) => {
-        const errors = {};
+    //更新処理関数
+    const updateFunction = () => {
+        
+        //多重送信防止
+        if(isSubmit) return;
+        setIsSubmit(true)
 
-        if ((title ?? "").trim() ==="") {
-            errors.taskTitle = "※タイトルは必須です";
-        } else if (title.length > 20) {
-            errors.taskTitle = "※タイトルは20文字以内で入力してください";
+        //バリデーション    
+        const errors = validateInput(title,description);
+        if(Object.keys(errors).length > 0){
+            setInputError(errors);
+            setIsSubmit(false);
+            return;
         }
+        setInputError({});
 
-        if (description.length > 256) {
-            errors.taskDescription = "※説明は256文字以内で入力してください";
-        }
-
-        return errors;
-  };
-
+        //送信
+        handleUpdateTask(currentTask.taskId,{taskTitle:title,taskDescription:description})
+    }
 
     return(
         <div className={style.container}>
@@ -73,24 +77,7 @@ const EditTaskForm = ({handleUpdateTask}) =>{
                 </button>
                 <button 
                     type="submit" 
-                    onClick={()=>{
-
-                        //多重送信防止
-                        if(isSubmit) return;
-                        setIsSubmit(true)
-
-                        //バリデーション    
-                        const errors = handleValidateInput(title,description);
-                        if(Object.keys(errors).length > 0){
-                            setInputError(errors);
-                            setIsSubmit(false);
-                            return;
-                        }
-                        setInputError({});
-
-                        //送信
-                        handleUpdateTask(currentTask.taskId,{taskTitle:title,taskDescription:description})
-                    }}
+                    onClick={()=>updateFunction()}
                     className={cx(baseStyle.baseBtn,style.createBtn)}
                     >保存
                 </button>

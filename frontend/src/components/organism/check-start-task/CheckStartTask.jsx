@@ -6,12 +6,13 @@ import { useTaskTimer } from "../../../context/TaskTimerProvider";
 import cx from "classnames";
 import style from "./CheckStartTask.module.css"
 import baseStyle from "../../../style/Util.module.css"
+import { TAKS_STATUS } from "../../../constants/appConstants";
 
 
 const CheckStartTask = ({tasks,handleUpdateTask}) =>{
 
     const {closeModal,currentTask} = useModalControl();  
-    const {elapsed,startTimer,switchTaskTimer} = useTaskTimer();    
+    const {elapsed,startTimer,stopTimer} = useTaskTimer();    
 
     return(
         <>
@@ -24,14 +25,14 @@ const CheckStartTask = ({tasks,handleUpdateTask}) =>{
                     >キャンセル</button>
                     <button 
                         onClick={ async () =>{
-                            const runTaskArray =  tasks.filter( (task) => task.taskStatus === "RUNNING")
+                            const runTaskArray =  tasks.filter( (task) => task.taskStatus === TAKS_STATUS.RUNNING)
                             console.log(`${currentTask}//${runTaskArray[0]}`)
 
-                            switchTaskTimer(runTaskArray[0])
-                            await handleUpdateTask(runTaskArray[0].taskId,{taskStatus:"PAUSE",elapsedTime:elapsed})
+                            stopTimer(runTaskArray[0])
+                            await handleUpdateTask(runTaskArray[0].taskId,{taskStatus:TAKS_STATUS.PAUSE,elapsedTime:elapsed})
 
                             startTimer(currentTask)
-                            await handleUpdateTask(currentTask.taskId,{taskStatus:"RUNNING"})
+                            await handleUpdateTask(currentTask.taskId,{taskStatus:TAKS_STATUS.RUNNING})
                         } }
                     className={cx(baseStyle.baseBtn,style.createBtn)}                       
                     >問題ない</button>

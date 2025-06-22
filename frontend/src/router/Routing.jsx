@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation, useNavigate} from "react-router-dom"
-import { useState,useMemo,useEffect, useRef} from "react";
+import { useState,useEffect} from "react";
 
 //各コンポーネント
 import Home from "../components/pages/home/Home.jsx"
@@ -10,7 +10,7 @@ import NotFoundPage from "../components/pages/not-found-page/NotFoundPage.jsx";
 import { useAuth } from "../context/AuthenticationProvider.jsx";
 
 //path定義ファイル
-import ROUTE_PATHS  from "./routePath.js";
+import { ROUTE_PATHS, STORAGE_NAMES } from "../constants/appConstants.js";
 
 import { Navigate } from "react-router-dom";
 
@@ -22,17 +22,6 @@ const Routing = () =>{
     const {isAuth} = useAuth();     //認証状態
 
     
-    //tasksの値が更新されたとき、グルーピング処理
-    const groupedTasks = useMemo( ()=>{
-        return{
-        "RUNNING":tasks.filter( task=>task.taskStatus==="RUNNING" ),
-        "PAUSE":tasks.filter( task=>task.taskStatus==="PAUSE" ),
-        "TODO":tasks.filter( task=>task.taskStatus==="TODO" ),
-        "STOP":tasks.filter( task=>task.taskStatus==="STOP" )
-        }   
-    },[tasks] )
-    
-
     //システムダウンの検知
     useEffect( ()=>{
 
@@ -40,8 +29,8 @@ const Routing = () =>{
 
         //タブ削除、ブラウザ削除時
         const handleBeforeUnload = () => {
-            if(groupedTasks["RUNNING"].length === 0) return;
-            localStorage.setItem("needRecoveryBySystem", "true");
+            if(tasks.some( task =>task.taskStatus==="RUNNING")) return;
+            localStorage.setItem(STORAGE_NAMES.NEED_RECOVERY_BY_SYSTEM, "true");
         };
 
         window.addEventListener("beforeunload", handleBeforeUnload);

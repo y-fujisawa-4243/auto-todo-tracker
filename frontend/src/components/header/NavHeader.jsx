@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import ROUTE_PATHS from "../../router/routePath";
+import { MODAL_TYPE, ROUTE_PATHS } from "../../constants/appConstants";
 import { postSignout } from "../../api/taskApi";
 
 //css関連
@@ -30,7 +30,7 @@ const NavHeader = () =>{
                     }}>
                         <p>完了タスク一覧</p>
                     </li>
-                    <li className={style.signout} onClick={()=>openModal("SIGN_OUT")}>
+                    <li className={style.signout} onClick={()=>openModal(MODAL_TYPE.SIGN_OUT)}>
                         <p>サインアウト</p>
                     </li>
                 </ul>
