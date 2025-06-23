@@ -76,8 +76,6 @@ const CreataeTaskForm = ({handleCreateTask}) =>{
             <button 
                 type="submit" 
                 onClick={()=>criateFunction()}
-
-                
                 className={cx(baseStyle.baseBtn,style.createBtn)}
                 >作成
             </button>
