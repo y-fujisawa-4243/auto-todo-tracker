@@ -109,8 +109,16 @@ public class UsersController {
 
     //認証済みかの確認処理
     @GetMapping("/auth/check")
-    public ResponseEntity<?> checkAuth() throws AuthenticationException{
-        System.out.println("認証チェック");
+    public ResponseEntity<?> checkAuth(HttpServletRequest request) throws AuthenticationException{
+
+        //送信時、SessionIDが存在するか、しない場合はnullを返送。
+        HttpSession session = request.getSession(false);
+
+        //SessionIDが存在しない時点で、未認証を返送。※sessionの自走生成を防ぐ意図。
+        if(session == null){
+            throw new AuthenticationCredentialsNotFoundException("未認証状態です");
+        }
+
         if(usersService.checkAuth()){
             return ResponseEntity.ok().build();
         }else {
