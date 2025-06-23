@@ -55,11 +55,6 @@ function App() {
           </TaskTimerProvider>
         </AuthenticationProvider>
 
-
-                  <button onClick={()=>userAllDelete()}>ユーザー全削除</button>
-                        <button onClick={() => allDelete()}>全てを破壊する</button>
-                        <button onClick={() => getUser()}>情報取得</button>
-                  <button onClick={()=>clearStrage()}>ストレージ削除</button>
     </div>
   )
 }
@@ -70,5 +65,8 @@ export default App;
         <button onClick={() => generateTestData()}>test</button>
         <button onClick={() => generateTime()}>359990</button>
         <button onClick={() => allDelete()}>全てを破壊する</button>
-
+        <button onClick={()=>userAllDelete()}>ユーザー全削除</button>
+        <button onClick={() => allDelete()}>全てを破壊する</button>
+        <button onClick={() => getUser()}>情報取得</button>
+        <button onClick={()=>clearStrage()}>ストレージ削除</button>
 */ 

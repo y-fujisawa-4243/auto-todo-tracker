@@ -37,7 +37,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
     const taskOptions = [
         {status:TAKS_STATUS.RUNNING,label:"進捗中"},
         {status:TAKS_STATUS.PAUSE,label:"中断"},
-        {status:TAKS_STATUS.TODO,label:"作業中"}
+        {status:TAKS_STATUS.TODO,label:"未実施"}
     ]
 
 
