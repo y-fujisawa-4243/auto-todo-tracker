@@ -16,8 +16,11 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<TaskEntity,Long> {
     //基本的なCRUD操作は未記載でOK
 
-    //引数を条件として、指定ID以外で一致するレコードが存在するかを返す
-    boolean existsByTaskStatusAndTaskIdNot(TaskStatus taskStatus, Long taskId);
+    /*taskRepository内から
+    usersIdが一致している かつ
+    taskStatusが一致している かつ
+    更新するタスクとは異なるタスク のタスクが存在するか*/
+    boolean existsByUsers_UsersIdAndTaskStatusAndTaskIdNot(Long usersId, TaskStatus taskStatus, Long taskId);
 
     //ユーザーそれぞれのタスクと紐づくセッションを取得する
     @Query("SELECT task FROM TaskEntity task JOIN FETCH task.session WHERE task.users.usersId =:usersId")

@@ -164,7 +164,11 @@ public class TaskService {
         //taskStatusがRUNNING かつ 他にもRUNNINGのタスクが存在する場合はエラー
         if (patchTaskDTO.taskStatus() != null){
             if(patchTaskDTO.taskStatus() == TaskStatus.RUNNING &&
-                    taskRepository.existsByTaskStatusAndTaskIdNot(TaskStatus.RUNNING, taskEntity.getTaskId())){
+                    taskRepository.existsByUsers_UsersIdAndTaskStatusAndTaskIdNot(
+                            taskEntity.getUsers().getUsersId(),
+                            TaskStatus.RUNNING,
+                            taskEntity.getTaskId()
+                    )){
                 throw  new ConflictException("作業中タスクがほかに存在します");
             }
             taskEntity.setTaskStatus(patchTaskDTO.taskStatus());
