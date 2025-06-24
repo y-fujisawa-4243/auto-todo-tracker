@@ -4,22 +4,21 @@ import auto_todo_tracker.exception.BadRequestException;
 import auto_todo_tracker.exception.ConflictException;
 import auto_todo_tracker.exception.ResourceNotFoundException;
 import auto_todo_tracker.exception.TaskLimitException;
+
 import auto_todo_tracker.model.dto.PatchTaskDTO;
 import auto_todo_tracker.model.dto.PostTaskDTO;
 import auto_todo_tracker.model.dto.TaskDTO;
 import auto_todo_tracker.model.entity.*;
+
 import auto_todo_tracker.repository.SessionRepository;
 import auto_todo_tracker.repository.TaskRepository;
-
 import auto_todo_tracker.repository.UsersRepository;
 import auto_todo_tracker.util.SecurityUtil;
+
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Service
@@ -31,7 +30,9 @@ public class TaskService {
 
 
     //コンストラクタ
-    public TaskService(TaskRepository taskRepository, SessionRepository sessionRepository, UsersRepository usersRepository){
+    public TaskService(TaskRepository taskRepository, 
+                       SessionRepository sessionRepository,
+                       UsersRepository usersRepository){
         this.taskRepository = taskRepository;
         this.sessionRepository = sessionRepository;
         this.usersRepository = usersRepository;
@@ -82,8 +83,6 @@ public class TaskService {
         //保存
         TaskEntity newTaskEntity = taskRepository.save(taskEntity);
         SessionEntity newSessionEntity = sessionRepository.save(sessionEntity);
-
-        System.out.println(TaskDTO.toDTO(newTaskEntity,newSessionEntity));
 
         //TaskDTOとして返す
         return TaskDTO.toDTO(newTaskEntity,newSessionEntity);

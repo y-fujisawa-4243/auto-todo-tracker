@@ -1,8 +1,10 @@
+//Reactライブラリ
 import Modal from 'react-modal';
-import { useContext } from 'react';
-import { useModalControl } from '../../../context/ModalControlProvider';
 
-//css
+//Context
+import { useModalControl } from "../../../context/ModalControlProvider"
+
+//スタイル
 import style from "./ModalForm.module.css"
 
 

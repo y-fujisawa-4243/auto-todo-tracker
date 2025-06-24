@@ -1,3 +1,4 @@
+//グローバル定数
 import { STORAGE_NAMES } from "../constants/appConstants";
 
 //タスク更新データを構築する関数
@@ -47,4 +48,17 @@ export const validateInput = (title,description) =>{
 export const removeRunTaskBu = () =>{
     localStorage.removeItem(STORAGE_NAMES.RUNNING_TASK_BACKUP);
 
+}
+
+
+//開始日時取得関数
+export const getCreatedAt = () =>{
+
+    const d = new Date();
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth()+1).padStart(2, "0");   //0~11の範囲で返送されるため、+1処理。10月より前ならば0をつける。
+    const date = String(d.getDate()).padStart(2, "0");   //0~11の範囲で返送されるため、+1処理。10月より前ならば0をつける。
+
+    return `${year}-${month}-${date}`;
 }

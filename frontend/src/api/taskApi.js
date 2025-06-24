@@ -44,6 +44,5 @@ export const postSignout= async () =>{
 
 //認証状態の確認API
 export const checkAuth = async() =>{
-    console.log("発火")
     return await axios.get(`${TGT_URL}/auth/check`, { withCredentials: true })
 } 

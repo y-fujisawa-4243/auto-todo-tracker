@@ -5,13 +5,9 @@ import auto_todo_tracker.model.dto.PostUsersDTO;
 import auto_todo_tracker.model.entity.UsersEntity;
 import auto_todo_tracker.repository.UsersRepository;
 import auto_todo_tracker.util.SecurityUtil;
-import com.sun.jdi.request.DuplicateRequestException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.security.Security;
 
 @Service
 public class UsersService {

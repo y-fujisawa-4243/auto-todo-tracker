@@ -1,26 +1,33 @@
-//ライブラリ
+//Reactライブラリ
 import { useEffect, useMemo } from 'react';
-import { useModalControl } from '../../../context/ModalControlProvider';
+
+//Context
+import { useModalControl } from "../../../context/ModalControlProvider"
 
 //コンポーネント
-import NavHeader from "../../header/NavHeader";
-import TaskCard from "../../organism/task-card/TaskCard";
+import SideMenu from "../../side-menu/SideMenu"
+import TaskCard from "../../task/task-card/TaskCard"
 
 //スタイル
 import cx from "classnames";
 import style from "./BaseTaskList.module.css"
 import baseStyle from "../../../style/Util.module.css"
 
-//自作関数
-import { postTask,deleteTask, getTasks,patchTask} from "../../../api/taskApi";
+//API関数
+import { getTasks} from "../../../api/taskApi";
 import { useTaskTimer } from '../../../context/TaskTimerProvider';
-import { MODAL_TYPE, STORAGE_NAMES, TAKS_STATUS } from '../../../constants/appConstants';
+
+//util関数
 import { removeRunTaskBu } from '../../../util/taskUtil';
+
+//グローバル定数
+import { MODAL_TYPE, STORAGE_NAMES, TAKS_STATUS } from "../../../constants/appConstants";
+
 
 const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpdateTask}) => {
 
     const {openModal} = useModalControl(); 
-    const {elapsed,intervalRef} = useTaskTimer();
+    const {intervalRef} = useTaskTimer();
 
     //tasksの値が更新されたとき、グルーピング処理
     const groupedTasks = useMemo( ()=>{
@@ -73,10 +80,6 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
         const needRecoveryBySystem = localStorage.getItem(STORAGE_NAMES.NEED_RECOVERY_BY_SYSTEM);
         const needRecoveryByHome = localStorage.getItem(STORAGE_NAMES.NEED_RECOVERY_BY_HOME);
 
-        console.log("buRunTask///"+buRunTask)
-        console.log("needRecoveryBySystem///"+needRecoveryBySystem)
-        console.log("needRecoveryByHome///"+needRecoveryByHome)
-
         //それぞれ非同期で処理
         const initTaskList = async () => {
 
@@ -103,7 +106,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
         <>
         <div className={style.layout}>
             <div className={style.navBar}>
-                <NavHeader />
+                <SideMenu />
             </div>
             <main className={style.mainContainer}>
                 {isInCompletedTaskList ? (<h2>タスク一覧</h2>):(<h2>完了タスク一覧</h2>)}
