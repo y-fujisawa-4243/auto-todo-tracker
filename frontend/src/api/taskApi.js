@@ -19,7 +19,7 @@ export const postTask = async (taskTitle,taskDescription,createdAt) =>{
 
 //DeleteAPI
 export const deleteTask = async (taskId) =>{
-    return await axios.delete(`${TGT_URL}`+`/${taskId}`, { withCredentials: true })
+    return await axios.delete(`${TGT_URL}/${taskId}`, { withCredentials: true })
 }
 
 //PatchAPI
@@ -44,6 +44,5 @@ export const postSignout= async () =>{
 
 //認証状態の確認API
 export const checkAuth = async() =>{
-    console.log("発火")
     return await axios.get(`${TGT_URL}/auth/check`, { withCredentials: true })
 } 

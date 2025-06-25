@@ -3,9 +3,7 @@ package auto_todo_tracker.util;
 import auto_todo_tracker.model.entity.UsersEntity;
 import auto_todo_tracker.repository.UsersRepository;
 import auto_todo_tracker.security.CustomUserDetails;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,12 +36,6 @@ public class SecurityUtil {
         //ユーザー情報取得
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        System.out.println("=== 認証チェック ===");
-
-        System.out.println("Authentication: " + authentication);
-        System.out.println("Authentication class: " + (authentication != null ? authentication.getClass().getSimpleName() : "null"));
-        System.out.println("isAuthenticated: " + (authentication != null && authentication.isAuthenticated()));
-        System.out.println("isAnonymous: " + (authentication instanceof AnonymousAuthenticationToken));
         /*
         認証済みかの判定。
         備考：
@@ -52,8 +44,6 @@ public class SecurityUtil {
         * */
         return authentication != null && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken);
-
-
 
     }
 

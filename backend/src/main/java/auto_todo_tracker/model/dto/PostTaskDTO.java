@@ -3,10 +3,10 @@ package auto_todo_tracker.model.dto;
 import auto_todo_tracker.model.entity.SessionEntity;
 import auto_todo_tracker.model.entity.TaskEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.hibernate.Session;
 
 import java.time.LocalDate;
 

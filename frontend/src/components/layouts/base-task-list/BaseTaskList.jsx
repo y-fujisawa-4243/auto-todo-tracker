@@ -1,26 +1,40 @@
-//ライブラリ
-import { useEffect, useMemo } from 'react';
-import { useModalControl } from '../../../context/ModalControlProvider';
+//Reactライブラリ
+import { useState ,useEffect, useMemo } from 'react';
+
+//Context
+import { useModalControl } from "../../../context/ModalControlProvider"
 
 //コンポーネント
-import NavHeader from "../../header/NavHeader";
-import TaskCard from "../../organism/task-card/TaskCard";
+import SideMenu from "../../side-menu/SideMenu"
+import TaskCard from "../../task/task-card/TaskCard"
 
 //スタイル
 import cx from "classnames";
 import style from "./BaseTaskList.module.css"
 import baseStyle from "../../../style/Util.module.css"
 
-//自作関数
-import { postTask,deleteTask, getTasks,patchTask} from "../../../api/taskApi";
+//Context
 import { useTaskTimer } from '../../../context/TaskTimerProvider';
-import { MODAL_TYPE, STORAGE_NAMES, TAKS_STATUS } from '../../../constants/appConstants';
+
+//util関数
 import { removeRunTaskBu } from '../../../util/taskUtil';
 
-const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpdateTask}) => {
+//グローバル定数
+import {  MODAL_TYPE, STORAGE_NAMES, TAKS_STATUS } from "../../../constants/appConstants";
+
+
+const BaseTaskList = (
+    {
+        tasks,
+        isInCompletedTaskList,
+        getOptions,
+        handleUpdateTask,
+        fetchTasks
+    }) => {
 
     const {openModal} = useModalControl(); 
-    const {elapsed,intervalRef} = useTaskTimer();
+    const {intervalRef} = useTaskTimer();
+
 
     //tasksの値が更新されたとき、グルーピング処理
     const groupedTasks = useMemo( ()=>{
@@ -53,18 +67,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
 
     }
 
-
-    //タスク取得処理
-    const fetchTasks = async () => {
-        try {
-            const response = await getTasks();
-            setTasks(response.data);
-        } catch (error) {
-            console.log(error)
-        }
-    };
-
-
+    
     //マウント時初期処理
     useEffect( ()=>{
 
@@ -72,10 +75,6 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
         const buRunTask = localStorage.getItem(STORAGE_NAMES.RUNNING_TASK_BACKUP);
         const needRecoveryBySystem = localStorage.getItem(STORAGE_NAMES.NEED_RECOVERY_BY_SYSTEM);
         const needRecoveryByHome = localStorage.getItem(STORAGE_NAMES.NEED_RECOVERY_BY_HOME);
-
-        console.log("buRunTask///"+buRunTask)
-        console.log("needRecoveryBySystem///"+needRecoveryBySystem)
-        console.log("needRecoveryByHome///"+needRecoveryByHome)
 
         //それぞれ非同期で処理
         const initTaskList = async () => {
@@ -95,7 +94,6 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
         //発火位置
         initTaskList();
 
-        return undefined;
     },[])
     
 
@@ -103,7 +101,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
         <>
         <div className={style.layout}>
             <div className={style.navBar}>
-                <NavHeader />
+                <SideMenu />
             </div>
             <main className={style.mainContainer}>
                 {isInCompletedTaskList ? (<h2>タスク一覧</h2>):(<h2>完了タスク一覧</h2>)}
@@ -132,7 +130,6 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
                                     return(
                                         <div key={task.key} className={style.cardContainer}>
                                             <TaskCard 
-                                                key={task.taskId} 
                                                 task={task} 
                                                 tasks={tasks} 
                                                 getOptions={getOptions} 

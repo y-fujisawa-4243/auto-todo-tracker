@@ -1,13 +1,11 @@
 package auto_todo_tracker.repository;
 
-import auto_todo_tracker.model.dto.TaskDTO;
 import auto_todo_tracker.model.entity.TaskEntity;
 import auto_todo_tracker.model.entity.TaskStatus;
-import auto_todo_tracker.model.entity.UsersEntity;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

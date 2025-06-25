@@ -4,8 +4,7 @@ import auto_todo_tracker.model.entity.UsersEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import org.hibernate.validator.constraints.UniqueElements;
-import org.springframework.context.annotation.Primary;
+
 
 public record PostUsersDTO(
 
