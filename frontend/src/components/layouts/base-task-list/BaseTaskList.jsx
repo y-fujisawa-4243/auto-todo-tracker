@@ -29,7 +29,8 @@ const BaseTaskList = (
         isInCompletedTaskList,
         getOptions,
         handleUpdateTask,
-        fetchTasks
+        fetchTasks,
+        checkTaskOwner
     }) => {
 
     const {openModal} = useModalControl(); 
@@ -81,6 +82,10 @@ const BaseTaskList = (
 
             //進捗中タスクがあるならば、復旧処理
             if(buRunTask && buRunTask.length !==0){
+
+                //localStargeに格納されたtaskがユーザー所有権がないものであれば復旧処理はしない
+                if(!checkTaskOwner(buRunTask)) return;
+
                 //タブまたはブラウザ削除要因 || ホーム画面遷移要因 || 進捗中タスクが存在するのに計測が停止している場合(intervalIDがfalse)
                 if(needRecoveryBySystem || needRecoveryByHome || !intervalRef.current ) {
                     await recoveryRunTask(buRunTask);

@@ -195,7 +195,13 @@ public class TaskService {
         return new TaskWithSession(newTaskEntity,newSessionEntity);
     }
 
-    public void deleteTask() {
-        taskRepository.deleteAll();
+    //引数のタスクが認証されたユーザーのタスクか確認
+    public boolean isUserOwnerOfTask(long taskId) {
+
+        //該当ユーザー取得
+        SecurityUtil secUtil = new SecurityUtil(usersRepository);
+        Long usersId = secUtil.getCurrentUser().getUsersId();
+
+        return taskRepository.existsByUsers_UsersIdAndTaskId(usersId,taskId);
     }
 }

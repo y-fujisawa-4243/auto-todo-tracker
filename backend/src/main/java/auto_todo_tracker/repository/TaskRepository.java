@@ -26,4 +26,7 @@ public interface TaskRepository extends JpaRepository<TaskEntity,Long> {
 
     //ユーザーが保持しているタスク数の取得
     long countByUsers_UsersId(Long usersId);
+
+    //ユーザーがそのタスクを保持しているか
+    boolean existsByUsers_UsersIdAndTaskId(Long usersId, Long taskId);
 }
