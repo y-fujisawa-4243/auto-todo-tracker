@@ -1,5 +1,5 @@
 //Reactライブラリ
-import { useEffect, useMemo } from 'react';
+import { useState ,useEffect, useMemo } from 'react';
 
 //Context
 import { useModalControl } from "../../../context/ModalControlProvider"
@@ -13,21 +13,28 @@ import cx from "classnames";
 import style from "./BaseTaskList.module.css"
 import baseStyle from "../../../style/Util.module.css"
 
-//API関数
-import { getTasks} from "../../../api/taskApi";
+//Context
 import { useTaskTimer } from '../../../context/TaskTimerProvider';
 
 //util関数
 import { removeRunTaskBu } from '../../../util/taskUtil';
 
 //グローバル定数
-import { MODAL_TYPE, STORAGE_NAMES, TAKS_STATUS } from "../../../constants/appConstants";
+import {  MODAL_TYPE, STORAGE_NAMES, TAKS_STATUS } from "../../../constants/appConstants";
 
 
-const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpdateTask}) => {
+const BaseTaskList = (
+    {
+        tasks,
+        isInCompletedTaskList,
+        getOptions,
+        handleUpdateTask,
+        fetchTasks
+    }) => {
 
     const {openModal} = useModalControl(); 
     const {intervalRef} = useTaskTimer();
+
 
     //tasksの値が更新されたとき、グルーピング処理
     const groupedTasks = useMemo( ()=>{
@@ -60,18 +67,7 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
 
     }
 
-
-    //タスク取得処理
-    const fetchTasks = async () => {
-        try {
-            const response = await getTasks();
-            setTasks(response.data);
-        } catch (error) {
-            console.log(error)
-        }
-    };
-
-
+    
     //マウント時初期処理
     useEffect( ()=>{
 
@@ -98,7 +94,6 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
         //発火位置
         initTaskList();
 
-        return undefined;
     },[])
     
 
@@ -135,7 +130,6 @@ const BaseTaskList = ({tasks,setTasks,isInCompletedTaskList,getOptions,handleUpd
                                     return(
                                         <div key={task.key} className={style.cardContainer}>
                                             <TaskCard 
-                                                key={task.taskId} 
                                                 task={task} 
                                                 tasks={tasks} 
                                                 getOptions={getOptions} 

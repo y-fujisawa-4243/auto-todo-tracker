@@ -24,7 +24,7 @@ const EditTaskForm = ({handleUpdateTask}) =>{
         taskDescription:""
     });
 
-    const [isSubmit,setIsSubmit] = useState(false);
+    const [isSubmit,setIsSubmit] = useState(false); //ボタン連打に対応するため、ボタン状態を管理
 
     //更新処理関数
     const updateFunction = () => {

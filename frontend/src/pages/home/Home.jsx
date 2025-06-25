@@ -1,5 +1,5 @@
 //Reactライブラリ
-import { useEffect, useState } from "react";
+import { useEffect, useState , useRef } from "react";
 import { useNavigate} from "react-router-dom";
 
 //Context
@@ -7,45 +7,44 @@ import { useModalControl } from "../../context/ModalControlProvider";
 import { useAuth} from "../../context/AuthenticationProvider"           
 
 //コンポーネント
-import CreateUserAccount from "../../components/user/create-user-account/CreateUserAccount"
-import ModalForm from "../../components/layouts/modal-wrapper/ModalForm"
+import UserModalSwitch from "../../components/modals/UserModalSwitch";
 
 //グローバル定数
-import { MODAL_TYPE, ROUTE_PATHS } from "../../constants/appConstants";
+import {  MODAL_TYPE, ROUTE_PATHS } from "../../constants/appConstants";
 
 //API関数
 import { postSignIn ,postSignUp} from "../../api/taskApi";
+
+//util関数
+import { apiError, validateUser } from "../../util/taskUtil";
 
 //スタイル関連
 import cx from "classnames";
 import style from "./Home.module.css";
 import baseStyle from "../../style/Util.module.css";
 
+
 const Home = () =>{
 
-    const {isOpen, openModal ,closeModal} = useModalControl();
+    const {openModal ,closeModal} = useModalControl();
     const {isAuth,setIsAuth} = useAuth();
+    const [message,setMessage] = useState("");      //エラーメッセージ
 
+    //入力ステート
     const [userId,setUserId] = useState("");        
     const [password,setPassword] = useState("");
 
-    const navigate = useNavigate();
-
-    //サインアップ時のエラーメッセージステート
-    const [signupError,setSignupError] = useState({
-        userIdMsg:"",
-        passwordMsg:""
-    });
+    const isSubmit = useRef(null); //ボタン連打に対応するため、ボタン状態を管理
 
     //サインイン時のエラーメッセージステート
     const [signinError,setSigninError] = useState({
         userIdMsg:"",
         passwordMsg:"",
-        authMsg:""
     });
 
-
     //マウント時、認証状態ならばタスク一覧へ遷移
+    const navigate = useNavigate();
+
     useEffect( ()=>{
 
         if(isAuth){
@@ -56,47 +55,61 @@ const Home = () =>{
     },[isAuth,navigate]) //認証フラグによってページ遷移判定するため、依存配列に追加。
 
 
-    //バリデーション
-    const handleValidateUser = (userId,password) => {
-        const errors = {};
-
-        if ((userId ?? "").trim() ==="") {
-            errors.userIdMsg = "※ユーザーIDは必須入力です";
-        } else if (userId.length<4 || userId.length > 20) {
-            errors.userIdMsg = "※ユーザーIDは4文字以上~20文字以内で入力してください";
-        }
-
-
-        if ((password ?? "").trim() ==="") {
-            errors.passwordMsg = "※パスワードは必須入力です";       
-        }else if (password.length<8 || password.length > 64) {
-            errors.passwordMsg = "※パスワードは8文字以上~64文字以内で入力してください";
-        }
-
-        return errors;
-    };
-
-
     //アカウント新規作成
     const handleCreateAccount = async (userId,password) =>{
+
         try {
             await postSignUp(userId,password);
             closeModal();
+            return true;
+
         } catch (error) {
-            setSignupError({passwordMsg:error.response.data.errorMsg})
+            closeModal();
+            apiError(error,setMessage)
+            openModal(MODAL_TYPE.ERROR);
+            return false;
+
         }
     }
 
 
-    //サインイン処理
+    //サインイン要求
     const handleAuthUser = async (userId,password) =>{
+
         try {
             await postSignIn(userId,password);
             setIsAuth(true);
             navigate(ROUTE_PATHS.LIST);
+            return true;
+
         } catch (error) {
-            setSigninError({authMsg:error.response.data.errorMsg})
+            apiError(error,setMessage)
+            openModal(MODAL_TYPE.ERROR);
+            return false;
         }
+    }
+
+    //サインイン処理
+    const  signinFunction = async () =>{
+
+        //多重送信防止
+        if(isSubmit.current) return;
+        isSubmit.current=true;
+
+        //バリデーション
+        const errors = validateUser(userId,password);
+        if(Object.keys(errors).length > 0){
+            setSigninError(errors);
+            isSubmit.current=false;
+            return;
+        }
+        setSigninError({}); 
+
+        //送信
+        await handleAuthUser(userId,password)
+        isSubmit.current=false;
+
+        return;
     }
 
 
@@ -127,43 +140,19 @@ const Home = () =>{
                 <div className={style.btnWrap}>      
                     <button 
                         className={cx(style.signinBtn,baseStyle.baseBtn)}
-                        onClick={ async ()=>{
-                        
-                            //バリデーション
-                            const errors = handleValidateUser(userId,password);
-                            if(Object.keys(errors).length > 0){
-                                setSigninError(errors);
-                                console.log(signinError)
-                                return;
-                            }
-
-                            setSigninError({}); 
-
-                            //送信かつ成功したらストレージ保存
-                            await handleAuthUser(userId,password)
-
-                    }}
+                        onClick={signinFunction}
                         >サインイン</button>
                 </div>
-                {signinError.authMsg && (
-                <p className={style.errorMsg}>{signinError.authMsg}</p>
-                )}
                 <p className={style.accountText}>まだアカウントをお持ちでない方は、以下から作成いただけます</p>
                 <button className={style.accountBtn} onClick={()=>openModal(MODAL_TYPE.ACCOUNT)}>
                     新規登録
                 </button>
             </div>
-            {isOpen ? (
-                <ModalForm>
-                    <CreateUserAccount 
-                        handleCreateAccount={handleCreateAccount}
-                        handleValidateUser ={handleValidateUser}
-                        signupError={signupError}
-                        setSignupError={setSignupError}
-                        >
-                    </CreateUserAccount>
-                </ModalForm>
-            ):null}
+            <UserModalSwitch 
+                handleCreateAccount={handleCreateAccount}
+                message={message}
+                >
+            </UserModalSwitch>
         </>
     )
 }

@@ -36,5 +36,9 @@ export const MODAL_TYPE = {
     WARN_RUN:"WARN_RUN",
     TASK_OVER:"TASK_OVER",
     SIGN_OUT:"SIGN_OUT",
-    ACCOUNT:"ACCOUNT"
+    ACCOUNT:"ACCOUNT",
+    ERROR:"ERROR"
 };
+
+//サーバー応答なしの場合のエラーメッセージ
+export const ERR_MSG = "サーバーの応答がありません。しばらくしてからもう一度お試しください。"

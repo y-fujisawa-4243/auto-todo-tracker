@@ -26,7 +26,7 @@ const Routing = () => {
 
         //タブ・ブラウザ削除時
         const handleBeforeUnload = () => {
-            if (tasks.some((task) => task.taskStatus === TAKS_STATUS.RUNNING)) return;
+            if (tasks.some((task) => task.taskStatus !== TAKS_STATUS.RUNNING)) return;
             localStorage.setItem(STORAGE_NAMES.NEED_RECOVERY_BY_SYSTEM, 'true');
         };
 

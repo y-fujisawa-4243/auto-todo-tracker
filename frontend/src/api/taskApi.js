@@ -19,7 +19,7 @@ export const postTask = async (taskTitle,taskDescription,createdAt) =>{
 
 //DeleteAPI
 export const deleteTask = async (taskId) =>{
-    return await axios.delete(`${TGT_URL}`+`/${taskId}`, { withCredentials: true })
+    return await axios.delete(`${TGT_URL}/${taskId}`, { withCredentials: true })
 }
 
 //PatchAPI

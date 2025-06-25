@@ -25,7 +25,7 @@ const CreataeTaskForm = ({handleCreateTask}) =>{
         taskDescription:""
     });
 
-    const [isSubmit,setIsSubmit] = useState(false);
+    const [isSubmit,setIsSubmit] = useState(false); //ボタン連打に対応するため、ボタン状態を管理
 
     //作成処理関数
     const criateFunction = () => {
@@ -45,6 +45,7 @@ const CreataeTaskForm = ({handleCreateTask}) =>{
 
         //送信
         handleCreateTask(title,description)
+        setIsSubmit(false)
     }
 
     return(

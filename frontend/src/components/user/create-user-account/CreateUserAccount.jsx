@@ -1,8 +1,11 @@
 //Reactライブラリ
-import { useState, useEffect } from "react";
+import { useState, useEffect ,useRef} from "react";
 
 //Context
 import { useModalControl } from "../../../context/ModalControlProvider";
+
+//util関数
+import { validateUser } from "../../../util/taskUtil";
 
 //スタイル
 import cx from "classnames";
@@ -10,19 +13,49 @@ import style from "./CreateUserAccount.module.css"
 import baseStyle from "../../../style/Util.module.css"
 
 
-const CreateUserAccount = ({handleCreateAccount,handleValidateUser,signupError,setSignupError}) =>{
+const CreateUserAccount = ({handleCreateAccount}) =>{
 
     const {closeModal} = useModalControl();   
 
     const [userId,setUserId] = useState("");
     const [password,setPassword] = useState("");
-    const [isSubmit,setIsSubmit] = useState(false);
+    const isSubmit = useRef(null) //ボタン連打に対応するため、ボタン状態を管理
+
+    //サインアップ時のエラーメッセージステート
+    const [signupError,setSignupError] = useState({
+        userIdMsg:"",
+        passwordMsg:""
+    });
+
 
     //マウント時、サインインエラーメッセージ作雄
     useEffect( ()=>{
         setSignupError("");
     },[setSignupError] )
 
+
+    //サインアップ処理
+    const signupFunction = async () =>{
+
+        //多重送信防止
+        if(isSubmit.current) return;
+        isSubmit.current=true
+
+        //バリデーション
+        const errors = validateUser(userId,password);
+        if(Object.keys(errors).length > 0){
+            setSignupError(errors);
+            isSubmit.current = false;
+            return;
+        }
+        setSignupError({}); 
+
+        //送信
+        await handleCreateAccount(userId,password)
+        isSubmit.current = false;
+
+        return;
+    }
 
     return(
         <div className={style.container}>
@@ -61,27 +94,7 @@ const CreateUserAccount = ({handleCreateAccount,handleValidateUser,signupError,s
             </button>
             <button 
                 type="submit" 
-                onClick={()=>{
-
-                    //多重送信防止
-                    if(isSubmit) return;
-                    setIsSubmit(true)
-
-                    //バリデーション
-                    const errors = handleValidateUser(userId,password);
-                    if(Object.keys(errors).length > 0){
-                        setSignupError(errors);
-                        setIsSubmit(false);
-                        return;
-                    }
-                    setSignupError({}); 
-
-                    //送信
-                    handleCreateAccount(userId,password)
-                    setIsSubmit(false);
-                }}
-
-                
+                onClick={signupFunction}
                 className={cx(baseStyle.baseBtn,style.createBtn)}
                 >登録
             </button>

@@ -1,20 +1,34 @@
-import KebabMenu from "./KebabMenu";
-import style from "./TaskCard.module.css";
+//Reactライブラリ
+import { useState } from 'react';
 
-/*MUI*/
+//MUI
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'; 
 import PauseIcon from '@mui/icons-material/Pause';
+import DoneIcon from '@mui/icons-material/Done';
 
+//コンポーネント
+import KebabMenu from "./KebabMenu";
+
+//Context
 import { useModalControl } from "../../../context/ModalControlProvider";
 import {useTaskTimer} from "../../../context/TaskTimerProvider"
-import DoneIcon from '@mui/icons-material/Done';
-import { MODAL_TYPE, STORAGE_NAMES, TAKS_STATUS } from "../../../constants/appConstants";
+
+//util関数
 import { removeRunTaskBu } from "../../../util/taskUtil";
+
+//グローバル定数
+import { MODAL_TYPE,  TAKS_STATUS } from "../../../constants/appConstants";
+
+//スタイル
+import style from "./TaskCard.module.css";
+
 
 const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}) =>{
 
     const {openModal} = useModalControl(); 
     const {elapsed,getTime,startTimer,stopTimer} =useTaskTimer();
+
+    const [isSubmit,setIsSubmit] = useState(false);  //ボタン連打に対応するため、ボタン状態を管理
 
     const runTask = tasks.find( (task)=>task.taskStatus === TAKS_STATUS.RUNNING )   //進捗中タスク
 
@@ -22,33 +36,57 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
     //完了or中断ボタンハンドラー
     const handleStopOrPause = async(status) => {
 
-        //進捗中タスクが停止したとき
+        //多重送信防止
+        if(isSubmit) return;
+        setIsSubmit(true)
+
+        //ボタン押したタスクが進捗中タスクの場合は、停止処理
         if (runTask && runTask.taskId === task.taskId){
             removeRunTaskBu();
+
+            //更新処理が失敗した場合、タイマー処理せずにreturn
+            const succes = await handleUpdateTask(task.taskId, {elapsedTime:elapsed, taskStatus: status });
+            setIsSubmit(false)
+            if(!succes) return;
             await stopTimer(task);
-            await handleUpdateTask(task.taskId, {elapsedTime:elapsed, taskStatus: status });
             return;
         }
 
-        //クリックしたタスクが進捗中タスクではないとき
-        await handleUpdateTask(task.taskId, { taskStatus: status });
+        //ボタンを押したタスクが進捗中タスクではないときは、遷移処理のみ
+
+        //更新処理が失敗した場合、タイマー処理せずにreturn
+        const succes = await handleUpdateTask(task.taskId, { taskStatus: status });
+        setIsSubmit(false)
+        if(!succes) return;
     }
 
 
     //開始ボタンハンドラー
     const handleStart = async() => {
 
+        //多重送信防止
+        if(isSubmit) return;
+        setIsSubmit(true)
+
         //クリックしたタスクの他に進捗中タスクがある場合
         if (runTask) {
             openModal(MODAL_TYPE.WARN_RUN, task);
+            setIsSubmit(false)
             return;
         }
 
         //ほかの進捗中タスクが存在しない場合
+
+        //更新処理が失敗した場合、タイマー処理せずにreturn
+        const succes = await handleUpdateTask(task.taskId, { taskStatus: TAKS_STATUS.RUNNING });
+        setIsSubmit(false)
+        if(!succes) return;
+
         startTimer(task);
-        await handleUpdateTask(task.taskId, { taskStatus: TAKS_STATUS.RUNNING });
-        
+
+        return;
     }
+    
 
     
     return(
@@ -103,8 +141,6 @@ const TaskCard = ({task,tasks,getOptions,handleUpdateTask,isInCompletedTaskList}
         </div>
         </>
     )
-
-
 }
 
 export default TaskCard;

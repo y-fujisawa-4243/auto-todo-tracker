@@ -1,16 +1,12 @@
 //Reactライブラリ
-import { useNavigate } from "react-router-dom";
+import { useRef} from "react";
 
 //Context
 import { useModalControl } from "../../../context/ModalControlProvider";
 import { useTaskTimer } from "../../../context/TaskTimerProvider";
-import { useAuth } from "../../../context/AuthenticationProvider";
-
-//API関数
-import { postSignout } from "../../../api/taskApi";
 
 //グローバル定数
-import { ROUTE_PATHS, STORAGE_NAMES, TAKS_STATUS } from "../../../constants/appConstants";
+import { STORAGE_NAMES, TAKS_STATUS } from "../../../constants/appConstants";
 
 //スタイル
 import cx from "classnames";
@@ -18,16 +14,20 @@ import style from "./CheckSignout.module.css"
 import baseStyle from "../../../style/Util.module.css"
 
 
-const CheckSignout = ({tasks}) =>{
+const CheckSignout = ({tasks,handleSignout}) =>{
+
+    const isSubmit = useRef(null); //ボタン状態管理用
 
     const {closeModal} = useModalControl();  
     const {stopTimer} = useTaskTimer(); 
-    const {setIsAuth} = useAuth();
 
-    const navigate = useNavigate();
     
     //サインアウト処理
-    const handleSignout = async() =>{
+    const signoutFunction = async() =>{
+
+        //多重送信防止処理
+        if(isSubmit.current) return;
+        isSubmit.current = true;
 
         const runTask = (tasks??[]).filter( task=>task.taskStatus===TAKS_STATUS.RUNNING);
 
@@ -37,15 +37,8 @@ const CheckSignout = ({tasks}) =>{
             localStorage.setItem(STORAGE_NAMES.NEED_RECOVERY_BY_HOME, "true");
         }
 
-        try {
-            await postSignout();
-            setIsAuth(false);
-            closeModal();
-            navigate(ROUTE_PATHS.HOME);
-        } catch (error) {
-            console.log(error);
-        }
-        
+        await handleSignout()
+        isSubmit.current = false;
     }
 
     return(
@@ -59,7 +52,7 @@ const CheckSignout = ({tasks}) =>{
                         className={cx(baseStyle.baseBtn,style.cancelBtn)}    
                     >キャンセル</button>
                     <button 
-                        onClick={()=>handleSignout()} 
+                        onClick={signoutFunction} 
                     className={cx(baseStyle.baseBtn,style.createBtn)}                       
                     >問題ない</button>
                 </div>

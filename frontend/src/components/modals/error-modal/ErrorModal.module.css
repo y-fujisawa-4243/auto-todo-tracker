@@ -1,0 +1,31 @@
+
+/*ウィンドウ内*/
+.formBox {
+    width: 100%;
+    max-width: 25rem;
+    text-align: center;
+    margin:0 auto;
+}
+
+.formBox h3{
+    text-align: center;
+    font-size: 1.4rem;
+    color: red;;
+}
+
+.formBox p{
+    font-size: 1.1rem;
+}
+
+/*ボタン*/
+.btnWrap{
+    text-align: center;
+    margin: 0px auto 2rem;
+}
+
+.cancelBtn{
+    background-color: rgb(255, 255, 255);
+    color:black;
+    width: 100px;
+    border:solid 2px rgb(201, 201, 201);
+}

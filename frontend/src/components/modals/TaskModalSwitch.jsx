@@ -9,15 +9,26 @@ import TaskDetail from "../task/task-detail/TaskDetail"
 import CheckDeleteTask from "../task/check-delete-task/CheckDeleteTask"
 import CheckStartTask from "../task/check-start-task/CheckStartTask"
 import TaskOver from "../task/task-over/TaskOver"
-import CheckSignout from "../user/check-signout/CheckSignout"
+import ErrorModal from "./error-modal/ErrorModal"
 
 //グローバル定数
 import { MODAL_TYPE } from "../../constants/appConstants"
+import CheckSignout from "../user/check-signout/CheckSignout"
 
 
-const ModalSwitch = ({tasks,handleCreateTask,handleDeleteTask,handleUpdateTask}) => {
+
+const TaskModalSwitch = (
+    {
+        tasks,
+        handleCreateTask,
+        handleDeleteTask,
+        handleUpdateTask,
+        handleSignout,
+        message
+    }) => {
 
     const {isOpen,modalType} = useModalControl();
+
 
     return(
         <div>
@@ -60,7 +71,13 @@ const ModalSwitch = ({tasks,handleCreateTask,handleDeleteTask,handleUpdateTask})
 
                 modalType === MODAL_TYPE.SIGN_OUT ? (
                 <ModalForm>
-                    <CheckSignout tasks={tasks}/>
+                    <CheckSignout tasks={tasks} handleSignout={handleSignout}/>
+                </ModalForm>
+                ) :
+
+                modalType === MODAL_TYPE.ERROR ? (
+                <ModalForm>
+                    <ErrorModal message={message}/>
                 </ModalForm>
                 ) :
 
@@ -73,4 +90,4 @@ const ModalSwitch = ({tasks,handleCreateTask,handleDeleteTask,handleUpdateTask})
 
 }
 
-export default ModalSwitch;
+export default TaskModalSwitch;
