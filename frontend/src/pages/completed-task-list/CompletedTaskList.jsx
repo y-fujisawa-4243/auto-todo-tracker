@@ -11,7 +11,7 @@ import BaseTaskList from "../../components/layouts/base-task-list/BaseTaskList"
 import TaskModalSwitch from "../../components/modals/TaskModalSwitch";
 
 //API関数
-import { getTasks,deleteTask,patchTask,postSignout} from "../..//api/taskApi";
+import { getTasks,deleteTask,patchTask,postSignout,checkTask} from "../..//api/taskApi";
 
 //util関数
 import { buildUpdateData ,apiError} from "../../util/taskUtil";
@@ -51,6 +51,17 @@ const CompletedTaskList = ({tasks,setTasks}) => {
             return false;
         }
     };
+
+    //---タスク所有権の確認-----
+    const checkTaskOwner = async(task) => {
+        try {
+            return await checkTask(task.taskId);
+        } catch (error) {
+            apiError(error,setMessage)
+            openModal(MODAL_TYPE.ERROR);
+            return false;
+        }       
+    }
 
 
     //---Delete関数-----
@@ -136,6 +147,7 @@ const CompletedTaskList = ({tasks,setTasks}) => {
                 getOptions = {getOptions}
                 handleUpdateTask={handleUpdateTask}
                 fetchTasks={fetchTasks}
+                checkTaskOwner={checkTaskOwner}
                 >
             </BaseTaskList> 
             <TaskModalSwitch

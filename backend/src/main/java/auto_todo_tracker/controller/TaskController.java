@@ -28,6 +28,12 @@ public class TaskController {
         return taskService.getAllTaskDTOs();
     }
 
+    //復旧時の進捗中タスク確認処理
+    @GetMapping("/task/check")
+    public boolean isUserOwnerOfTask(@PathVariable("id") Long taskId){
+        return taskService.isUserOwnerOfTask(taskId);
+    }
+
 
     //POSTの窓口
     @PostMapping("/tasks")

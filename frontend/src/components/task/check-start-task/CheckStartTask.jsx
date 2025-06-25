@@ -28,7 +28,7 @@ const CheckStartTask = ({tasks,handleUpdateTask}) =>{
 
         const startSucces = await handleUpdateTask(currentTask.taskId,{taskStatus:TAKS_STATUS.RUNNING})
         if(!startSucces ) return;
-        await startTimer(currentTask)            
+        await startTimer(currentTask)   
 
         return;
     }
@@ -43,7 +43,7 @@ const CheckStartTask = ({tasks,handleUpdateTask}) =>{
                     className={cx(baseStyle.baseBtn,style.cancelBtn)}    
                     >キャンセル</button>
                     <button 
-                        onClick={changeFunction()}
+                        onClick={changeFunction}
                     className={cx(baseStyle.baseBtn,style.createBtn)}                       
                     >問題ない</button>
                 </div>
