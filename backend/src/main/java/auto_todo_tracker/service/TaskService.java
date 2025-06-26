@@ -204,4 +204,8 @@ public class TaskService {
 
         return taskRepository.existsByUsers_UsersIdAndTaskId(usersId,taskId);
     }
+
+    public void deleteTask() {
+        taskRepository.deleteAll();
+    }
 }

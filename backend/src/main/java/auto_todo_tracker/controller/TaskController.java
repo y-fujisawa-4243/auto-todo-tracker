@@ -9,6 +9,7 @@ import auto_todo_tracker.model.dto.TaskDTO;
 import auto_todo_tracker.service.TaskService;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -54,6 +55,26 @@ public class TaskController {
     public TaskDTO patchTask(@PathVariable("id") Long taskId,
                              @Valid @RequestBody PatchTaskDTO patchTaskDTO) throws AccessDeniedException {
         return taskService.patchTaskById(taskId,patchTaskDTO);
+    }
+
+
+    //-デバッグ用-------------------------------------------------------------------------------
+    @PostMapping("/tasks/test")
+    public void generateTestTasks(@RequestParam(defaultValue = "50") int count) {
+        for (int i = 1; i <= count; i++) {
+            PostTaskDTO task = new PostTaskDTO(
+                    "テストタスク " + i,
+                    "これはテストデータです",
+                    LocalDate.now());
+
+            createTask(task);
+        }
+    }
+
+    @DeleteMapping("/tasksAll")
+    public void allDeleteTask(){
+        System.out.println("all delete");
+        taskService.deleteTask();
     }
 
 }
