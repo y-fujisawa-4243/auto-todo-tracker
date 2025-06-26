@@ -12,8 +12,8 @@ export const ROUTE_PATHS = {
 /*ローカルストレージ用キー名*/ 
 export const STORAGE_NAMES ={
     RUNNING_TASK_BACKUP:"runningTaskBackUp",
-    NEED_RECOVERY_BY_SYSTEM:"",
-    NEED_RECOVERY_BY_HOME:""
+    NEED_RECOVERY_BY_SYSTEM:"recoberyBySystem",
+    NEED_RECOVERY_BY_HOME:"recoberyByHome"
 };
 
 /*■タスクステータス定義*/

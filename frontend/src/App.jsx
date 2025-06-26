@@ -13,20 +13,20 @@ import { patchTask, checkAuth } from './api/taskApi';
 //----------------------------------------------------------
 
 const generateTestData = async () => {
-  await axios.post('https://auto-todo-tracker-production.up.railway.app/list/test', { count: 50 });
+  await axios.post('https://auto-todo-tracker-production.up.railway.app/list/test', { count: 50 }, { withCredentials: true });
   alert('テストデータを生成しました');
 };
 
 const generateTime = async () => {
-  await patchTask(340, { elapsedTime: 359990 });
+  await patchTask(340, { elapsedTime: 359990 }, { withCredentials: true });
 };
 
 const allDelete = async () => {
-  await axios.delete('https://auto-todo-tracker-production.up.railway.app/tasksAll');
+  await axios.delete('https://auto-todo-tracker-production.up.railway.app/tasksAll', { withCredentials: true });
 };
 
 const userAllDelete = async () => {
-  await axios.delete('https://auto-todo-tracker-production.up.railway.app/userAll');
+  await axios.delete('https://auto-todo-tracker-production.up.railway.app/userAll', { withCredentials: true });
 };
 
 const getUser = async () => {
