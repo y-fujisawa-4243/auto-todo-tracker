@@ -88,13 +88,13 @@ const InCompletedTaskList = ({tasks,setTasks}) => {
         }
     };
 
+
     //---タスク所有権の確認-----
-    const checkTaskOwner = async(task) => {
+    const checkTaskOwner = async(taskId) => {
         try {
-            return await checkTask(task.taskId);
+            const response = await checkTask(taskId);
+            return response.data
         } catch (error) {
-            apiError(error,setMessage)
-            openModal(MODAL_TYPE.ERROR);
             return false;
         }       
     }

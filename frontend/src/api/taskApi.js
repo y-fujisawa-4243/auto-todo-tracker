@@ -49,5 +49,5 @@ export const checkAuth = async() =>{
 
 //ユーザーが指定したタスクを保持しているかのAPI
 export const checkTask= async (taskId) =>{
-    return await axios.get(`${TGT_URL}/${taskId}`, { withCredentials: true })
+    return await axios.get(`${TGT_URL}/owner/check/${taskId}`, { withCredentials: true })
 }

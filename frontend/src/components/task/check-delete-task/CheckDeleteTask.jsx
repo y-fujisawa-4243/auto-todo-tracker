@@ -44,7 +44,10 @@ const CheckDeleteTask = ({handleDeleteTask}) =>{
                     className={cx(baseStyle.baseBtn,style.cancelBtn)}    
                     >キャンセル</button>
                     <button 
-                    onClick={deleteFunction}
+                    onClick={()=>{
+                        deleteFunction()
+                        closeModal()
+                    }}
                     className={cx(baseStyle.baseBtn,style.createBtn)}                       
                     >削除する</button>
                 </div>

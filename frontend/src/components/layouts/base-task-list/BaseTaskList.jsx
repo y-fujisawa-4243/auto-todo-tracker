@@ -68,34 +68,45 @@ const BaseTaskList = (
 
     }
 
+
+    //復旧処理が必要かどうか
+    const isRecovery = async (buRunTask,needRecoveryBySystem,needRecoveryByHome) => {
+
+        //バックアップに進捗中タスクがない場合false
+        if(!buRunTask || buRunTask.length ===0 ) return false;
+
+        const parsed = JSON.parse(buRunTask);
+
+        //バックアップタスクに所有権がない場合false
+        const isOwner = await checkTaskOwner(parsed.taskId); 
+        if(!isOwner) return false;
+
+        //タブまたはブラウザ削除要因 || ホーム画面遷移要因 || 進捗中タスクが存在するのに計測が停止している場合(intervalIDがfalse)
+        if(needRecoveryBySystem || needRecoveryByHome || !intervalRef.current ) return true;
+
+        return false
+
+    }
+
     
     //マウント時初期処理
     useEffect( ()=>{
 
-        //localStrageデータ取得
         const buRunTask = localStorage.getItem(STORAGE_NAMES.RUNNING_TASK_BACKUP);
         const needRecoveryBySystem = localStorage.getItem(STORAGE_NAMES.NEED_RECOVERY_BY_SYSTEM);
         const needRecoveryByHome = localStorage.getItem(STORAGE_NAMES.NEED_RECOVERY_BY_HOME);
 
-        //それぞれ非同期で処理
-        const initTaskList = async () => {
+        const initTaskList = async() => {
 
-            //進捗中タスクがあるならば、復旧処理
-            if(buRunTask && buRunTask.length !==0){
-
-                //localStargeに格納されたtaskがユーザー所有権がないものであれば復旧処理はしない
-                if(!checkTaskOwner(buRunTask)) return;
-
-                //タブまたはブラウザ削除要因 || ホーム画面遷移要因 || 進捗中タスクが存在するのに計測が停止している場合(intervalIDがfalse)
-                if(needRecoveryBySystem || needRecoveryByHome || !intervalRef.current ) {
-                    await recoveryRunTask(buRunTask);
-                    await fetchTasks();
-                    return;
-                }
+            //復旧処理をしてタスク取得 または タスク取得のみ
+            const shouldRecover = await isRecovery(buRunTask,needRecoveryBySystem,needRecoveryByHome);
+            if (shouldRecover) {
+            await recoveryRunTask(buRunTask);
             }
-            await fetchTasks();
+            
+            await fetchTasks();     
         }
-
+        
         //発火位置
         initTaskList();
 
