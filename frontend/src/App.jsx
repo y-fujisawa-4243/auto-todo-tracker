@@ -8,18 +8,15 @@ import { AuthenticationProvider } from './context/AuthenticationProvider';   //�
 
 
 //----------------------------------------------------------
+import { useState } from 'react';
 import axios from 'axios';
-import { patchTask, checkAuth } from './api/taskApi';
-//----------------------------------------------------------
+import { checkAuth } from './api/taskApi';
 
 const generateTestData = async () => {
   await axios.post('https://auto-todo-tracker-production.up.railway.app/list/test', { count: 50 }, { withCredentials: true });
   alert('テストデータを生成しました');
 };
 
-const generateTime = async () => {
-  await patchTask(340, { elapsedTime: 359990 }, { withCredentials: true });
-};
 
 const allDelete = async () => {
   await axios.delete('https://auto-todo-tracker-production.up.railway.app/tasksAll', { withCredentials: true });
@@ -42,8 +39,19 @@ const clearStrage = () => {
   localStorage.clear();
 };
 
+//----------------------------------------------------------
 
 function App() {
+
+//----------------------------------------------------------------------------------
+  const [id,setId] = useState("");
+
+ const generateTime = async () => {
+
+  return await axios.patch(`https://auto-todo-tracker-production.up.railway.app/${id}`, {elapsedTime:359990}, { withCredentials: true });
+ };
+//----------------------------------------------------------------------------------
+
   return (
     <>
     <div className="container">
@@ -55,13 +63,17 @@ function App() {
         </TaskTimerProvider>
       </AuthenticationProvider>
     </div>
-    <button onClick={() => generateTestData()}>test</button>
-    <button onClick={() => generateTime()}>359990</button>
-    <button onClick={() => allDelete()}>全てを破壊する</button>
-    <button onClick={()=>userAllDelete()}>ユーザー全削除</button>
-    <button onClick={() => allDelete()}>全てを破壊する</button>
-    <button onClick={() => getUser()}>情報取得</button>
-    <button onClick={()=>clearStrage()}>ストレージ削除</button>
+    <form>
+      <input type="text" onChange={(event)=>setId(event.target.value)}></input>
+      <button onClick={() => generateTestData()}>test</button>
+      <button type="button" onClick={() => generateTime()}>359990</button>
+      <button onClick={() => allDelete()}>全てを破壊する</button>
+      <button onClick={()=>userAllDelete()}>ユーザー全削除</button>
+      <button onClick={() => allDelete()}>全てを破壊する</button>
+      <button onClick={() => getUser()}>情報取得</button>
+      <button onClick={()=>clearStrage()}>ストレージ削除</button>
+    </form>
+
     </>
   );
 }

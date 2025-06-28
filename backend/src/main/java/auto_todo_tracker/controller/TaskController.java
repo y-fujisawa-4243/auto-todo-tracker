@@ -59,7 +59,7 @@ public class TaskController {
 
 
     //-デバッグ用-------------------------------------------------------------------------------
-    @PostMapping("/tasks/test")
+    @PostMapping("/list/test")
     public void generateTestTasks(@RequestParam(defaultValue = "50") int count) {
         for (int i = 1; i <= count; i++) {
             PostTaskDTO task = new PostTaskDTO(
