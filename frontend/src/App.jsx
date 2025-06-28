@@ -8,6 +8,7 @@ import { AuthenticationProvider } from './context/AuthenticationProvider';   //�
 
 
 //----------------------------------------------------------
+//※これはRailway自動デプロイ復旧のためのコメントです。
 import { useState } from 'react';
 import axios from 'axios';
 import { checkAuth } from './api/taskApi';
