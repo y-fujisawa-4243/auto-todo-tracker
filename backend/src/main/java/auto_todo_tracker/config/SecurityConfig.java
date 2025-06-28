@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .cors(cors -> {})
                 //ページアクセス権限の設定
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/signup","/signin","signout","/auth/check"
+                        .requestMatchers("/signup","/signin","/signout","/auth/check"
                                 ,"/check","/userAll","/tasksAll").permitAll()
                         .anyRequest().authenticated()
                 )

@@ -57,24 +57,4 @@ public class TaskController {
         return taskService.patchTaskById(taskId,patchTaskDTO);
     }
 
-
-    //-デバッグ用-------------------------------------------------------------------------------
-    @PostMapping("/list/test")
-    public void generateTestTasks(@RequestParam(defaultValue = "50") int count) {
-        for (int i = 1; i <= count; i++) {
-            PostTaskDTO task = new PostTaskDTO(
-                    "テストタスク " + i,
-                    "これはテストデータです",
-                    LocalDate.now());
-
-            createTask(task);
-        }
-    }
-
-    @DeleteMapping("/tasksAll")
-    public void allDeleteTask(){
-        System.out.println("all delete");
-        taskService.deleteTask();
-    }
-
 }

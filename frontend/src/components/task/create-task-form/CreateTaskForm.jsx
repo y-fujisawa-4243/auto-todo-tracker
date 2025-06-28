@@ -1,5 +1,5 @@
 //Reactライブラリ
-import { useState} from "react";
+import { useState,useRef} from "react";
 
 //Context
 import { useModalControl } from "../../../context/ModalControlProvider";
@@ -7,15 +7,19 @@ import { useModalControl } from "../../../context/ModalControlProvider";
 //util関数
 import { validateInput } from "../../../util/taskUtil";
 
+//グローバル定数
+import { MODAL_TYPE } from "../../../constants/appConstants";
+
 //スタイル
 import cx from "classnames";
 import style from "./CreateTaskForm.module.css"
 import baseStyle from "../../../style/Util.module.css"
 
 
-const CreataeTaskForm = ({handleCreateTask}) =>{
 
-    const {closeModal} = useModalControl();   
+const CreataeTaskForm = ({tasks,handleCreateTask}) =>{
+
+    const {openModal,closeModal} = useModalControl();   
 
     const [title,setTitle] = useState("");
     const [description,setDescription] = useState("");
@@ -25,27 +29,37 @@ const CreataeTaskForm = ({handleCreateTask}) =>{
         taskDescription:""
     });
 
-    const [isSubmit,setIsSubmit] = useState(false); //ボタン連打に対応するため、ボタン状態を管理
+    const isSubmit = useRef(null)  //ボタン連打に対応するためのRefオブジェクト
 
     //作成処理関数
     const criateFunction = () => {
+
+        const MAX_TASK = 50;        //最大タスク数
         
         //多重送信防止
-        if(isSubmit) return;
-        setIsSubmit(true)
+        if(isSubmit.current) return;
+        isSubmit.current = true;
         
         //バリデーション
         const errors = validateInput(title,description);
         if(Object.keys(errors).length > 0){
             setInputError(errors);
-            setIsSubmit(false);
+            isSubmit.current = false;           
             return;
         }
         setInputError({}); 
 
+        //タスク数確認
+        if(Object.keys(tasks).length >= MAX_TASK){
+            closeModal();
+            isSubmit.current = false;
+            openModal(MODAL_TYPE.TASK_OVER);
+            return;
+        }
+
         //送信
         handleCreateTask(title,description)
-        setIsSubmit(false)
+        isSubmit.current = false;
     }
 
     return(

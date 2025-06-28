@@ -110,10 +110,4 @@ public class UsersController {
         }
     }
 
-    //-デバッグ用-------------------------------------------------------------------------------
-    @DeleteMapping("/userAll")
-    public void deleteAllUser(){
-        usersRepository.deleteAll();
-    }
-
 }

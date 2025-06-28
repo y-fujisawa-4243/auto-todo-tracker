@@ -18,7 +18,7 @@ const TaskDetail = () =>{
                     <dt><b>タスク名</b></dt>
                     <dd>{currentTask.taskTitle}</dd>
                     <dt><b>タスク説明</b></dt>
-                    <dd>{currentTask.taskDescription}</dd>
+                    <dd className={style.description}>{currentTask.taskDescription}</dd>
                     <dt><b>作成日</b></dt>
                     <dd>{currentTask.createdAt}</dd>
                 </dl>

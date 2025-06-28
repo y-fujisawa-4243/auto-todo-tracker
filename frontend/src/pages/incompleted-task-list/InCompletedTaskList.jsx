@@ -41,19 +41,6 @@ const InCompletedTaskList = ({tasks,setTasks}) => {
    //---Create関数-----
     const handleCreateTask = async (taskTitle,taskDescription) =>{
 
-        const MAX_TASK = 50;        //最大タスク数
-
-        //多重送信防止処理
-        if(isSubmit.current) return;
-        isSubmit.current = true;
-
-        //バリデーション
-        if(Object.keys(tasks).length >= MAX_TASK){
-            closeModal();
-            openModal(MODAL_TYPE.TASK_OVER);
-            return;
-        } 
-
         //日付取得
         const startedAt = getCreatedAt();
 

@@ -75,12 +75,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResDTO,HttpStatus.CONFLICT);
     }
 
-    //500 汎用的なエラーハンドリング
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResDTO> handleServerError (Exception err){
-        ErrorResDTO errorResDTO = new ErrorResDTO(
-                "INTERNAL_SERVER_ERROR",
-                "サーバー内でエラーが発生しました。");
-        return new ResponseEntity<>(errorResDTO,HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

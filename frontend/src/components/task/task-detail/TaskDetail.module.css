@@ -24,6 +24,13 @@
 }
 
 
+/*タスク説明*/
+.description{
+  white-space: pre-wrap;   /* 入力の改行・空白を反映 */
+  word-break: break-word;  /* 長い単語も折り返す */
+  max-width: 100%;         /* ddの幅に合わせる */
+}
+
 /*ボタン*/
 .btnWrap{
     text-align: center;

@@ -9,7 +9,7 @@ export const buildUpdateData = (argsObj) =>{
 
     //引数解析
     if (argsObj.taskTitle ) data.taskTitle = argsObj.taskTitle;
-    if (argsObj.taskDescription ) data.taskDescription = argsObj.taskDescription;
+    if (argsObj.taskDescription!==undefined) data.taskDescription = argsObj.taskDescription; //タスク説明は空白でもよいため、undefined以外は編集対象
     if (argsObj.elapsedTime){
         if(argsObj.elapsedTime  > MAX_ELAPSED_SEC) {
             data.elapsedTime = MAX_ELAPSED_SEC

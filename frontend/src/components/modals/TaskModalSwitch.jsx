@@ -35,7 +35,7 @@ const TaskModalSwitch = (
             {isOpen ? (
                 modalType === MODAL_TYPE.CREATE ? (
                 <ModalForm>
-                    <CreataeTaskForm handleCreateTask={handleCreateTask} />
+                    <CreataeTaskForm tasks={tasks} handleCreateTask={handleCreateTask} />
                 </ModalForm>
                 ) :
 
