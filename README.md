@@ -126,8 +126,8 @@ Excel:[テスト仕様書](./docs/テスト仕様書_Ver.3.0.xlsx)
 スプレッドシート: https://docs.google.com/spreadsheets/d/178r5D-hBo0YdGcf-0ilmWNTVHcClXGsz/edit?usp=sharing&ouid=111410923100768686440&rtpof=true&sd=tru      
 - [テーブル定義書]    
 Excel:[テーブル定義書](./docs/テーブル設計書_Ver.3.xlsx)    
-スプレッドシート: https://docs.google.com/spreadsheets/d/1KLqVDZq7lK9nB-SPuWL5HycGD48rChxH/edit?usp=sharing&ouid=111410923100768686440&rtpof=true&sd=true     
-- [ER図（PNG）]
+スプレッドシート: https://docs.google.com/spreadsheets/d/1KLqVDZq7lK9nB-SPuWL5HycGD48rChxH/edit?usp=sharing&ouid=111410923100768686440&rtpof=true&sd=true       
+- [ER図（PNG）]  
  ![ER図](./docs/ER図_Ver.2.png)  
 
 <br><br>
