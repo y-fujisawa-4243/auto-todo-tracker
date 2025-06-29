@@ -127,9 +127,10 @@ Excel:[テスト仕様書](./docs/テスト仕様書_Ver.3.0.xlsx)
 - [テーブル定義書]    
 Excel:[テーブル定義書](./docs/テーブル設計書_Ver.3.xlsx)    
 スプレッドシート: https://docs.google.com/spreadsheets/d/1KLqVDZq7lK9nB-SPuWL5HycGD48rChxH/edit?usp=sharing&ouid=111410923100768686440&rtpof=true&sd=true     
-- [ER図（PNG）]![ER図](./docs/ER図_Ver.2.png)  
+- [ER図（PNG）]
+- ![ER図](./docs/ER図_Ver.2.png)  
 
 <br><br>
 ## ■備考  
 本アプリの開発にあたっては、設計・開発・リファクタリング・テストのすべての工程でChatGPTをフルスタックエンジニアのメンターとして活用いたしました。    
-あくまで補助的な使い方を心掛け、受動ではなく主導的な使い方で開発を進めております。
+あくまで補助的な使い方を心掛け、受動的ではなく、自ら考えて主体的に活用しました。
