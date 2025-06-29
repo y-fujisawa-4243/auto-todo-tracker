@@ -20,7 +20,7 @@
 業務経験が浅く、作業時間の見積もりや報告に不安があるエンジニアや新卒メンバー  
 個人で作業することが多く、進捗の可視化などがしにくい在宅ワーカー  
 
-
+<br><br>
 ## ■使用技術  
 ### フロントエンド 
 ・React[js] (v19.1.0)
@@ -58,7 +58,7 @@
 サインイン、サインアップが可能です。本ポートフォリオでは各企業様ごと専用のアカウントを用意しておりますので、そちらでサインインお願いいたします。 
 
 <p align="center">
-  <img src="./Home_Sample.PNG" width="600px" height="400px">  
+  <img src="./docs/Home_Sample.PNG" width="600px" height="400px">  
 </p>  
 [1]：サインイン機能の提供。 
 
@@ -67,7 +67,7 @@
 ### ▶タスク一覧画面説明  
 タスク作成、タスク詳細、タスク編集、タスク削除、計測開始/停止機能を提供しております。   
 <p align="center">
-  <img src="./Tasklist_Sample.PNG" width="600px" height="400px">
+  <img src="./docs/Tasklist_Sample.PNG" width="600px" height="400px">
 </p>  
 [3]：各種ページへの遷移ボタンおよびサインアウト機能。 
 
@@ -78,7 +78,7 @@
 ### ▶完了タスク一覧画面説明  
 タスク詳細、タスク削除を提供しております。  
 <p align="center">
-  <img src="./Comp_Sample.PNG" width="600px" height="400px">
+  <img src="./docs/Comp_Sample.PNG" width="600px" height="400px">
 </p>  
 [6]："完了"におけるタスクカード。カード右部の3点メニューからタスク詳細、削除機能をご利用いただけます。   
 <br><br>
@@ -120,14 +120,14 @@
 
 <br><br>
 ## ■ドキュメント一覧  
-- [要件定義書（.md）] [要件定義書](./要件定義書_Ver.6.md)    
+- [要件定義書（.md）] [要件定義書](./docs/要件定義書_Ver.6.md)    
 - [テスト仕様書]    
-Excel:[テスト仕様書](./テスト仕様書_Ver.3.0.xlsx)   
+Excel:[テスト仕様書](./docs/テスト仕様書_Ver.3.0.xlsx)   
 スプレッドシート: https://docs.google.com/spreadsheets/d/178r5D-hBo0YdGcf-0ilmWNTVHcClXGsz/edit?usp=sharing&ouid=111410923100768686440&rtpof=true&sd=tru      
 - [テーブル定義書]    
-Excel:[テーブル定義書](./テーブル設計書_Ver.3.xlsx)    
+Excel:[テーブル定義書](./docs/テーブル設計書_Ver.3.xlsx)    
 スプレッドシート: https://docs.google.com/spreadsheets/d/1KLqVDZq7lK9nB-SPuWL5HycGD48rChxH/edit?usp=sharing&ouid=111410923100768686440&rtpof=true&sd=true     
-- [ER図（PNG）]![ER図](./ER図_Ver.2.png)  
+- [ER図（PNG）]![ER図](./docs/ER図_Ver.2.png)  
 
 <br><br>
 ## ■備考  
